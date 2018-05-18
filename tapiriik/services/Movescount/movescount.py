@@ -15,36 +15,35 @@ class MovescountService(ServiceBase):
     DisplayName = "Movescount"
     DisplayAbbreviation = "MC"
     AuthenticationType = ServiceAuthenticationType.OAuth
-    AuthenticationNoFrame = True # otherwise looks ugly in the small frame
+    AuthenticationNoFrame = True # form not fit in the small frame
+
+    _api_endpoint = "https://partner-rest.movescount.com"
+    _ui_url = "https://partner-ui.movescount.com"
+
+    def _with_auth(self, serviceRecord):
+        pass
 
     def WebInit(self):
         params = {'client_id': MOVESCOUNT_APP_KEY,
                   'redirect_uri': WEB_ROOT + reverse("oauth_return", kwargs={"service": "movescount"})}
-        self.UserAuthorizationURL = "https://partner-ui.movescount.com/auth?" + urlencode(params)
+        self.UserAuthorizationURL = self._ui_url +"/auth?" + urlencode(params)
 
     def RetrieveAuthorizationToken(self, req, level):
-        params = {'client_id': MOVESCOUNT_APP_KEY,
-                  "redirect_uri": WEB_ROOT + reverse("oauth_return", kwargs={"service": "movescount"})}
+        error = req.GET.get("error", False)
+        if error:
+            raise APIException(error, user_exception=UserException(UserExceptionType.Authorization))
 
-        #response = requests.post("https://polarremote.com/v2/oauth2/token", data=params, auth=HTTPBasicAuth(POLAR_CLIENT_ID, POLAR_CLIENT_SECRET))
-        response = requests.post(self.UserAuthorizationURL)
-        data = response.json()
-
-        if response.status_code != 200:
-            raise APIException(data["error"])
-
-        authorizationData = {"OAuthToken": data["access_token"]}
-        userId = data["x_user_id"]
-
-        try:
-            pass#self._register_user(data["access_token"])
-        except requests.exceptions.HTTPError as err:
-            # Error 409 Conflict means that the user has already been registered for this client.
-            # That error can be ignored
-            if err.response.status_code != 409:
-                raise APIException("Unable to link user", block=True, user_exception=UserException(UserExceptionType.Authorization, intervention_required=True))
-
-        return (userId, authorizationData)
+        email = req.GET.get("email")
+        user_key = req.GET.get("userkey")
+        
+        authorizationData = {"OAuthToken": user_key}
+        
+        return (email, authorizationData)
 
     def RevokeAuthorization(self, serviceRecord):
-        pass#self._delete_user(serviceRecord)
+        #res = requests.delete(self._api_endpoint +
+        #    "/members/private/applications/appkey?appkey={}&userkey={}".format(MOVESCOUNT_APP_KEY, serviceRecord.Authorization["OAuthToken"]))
+        pass # Not used.
+
+    def DeleteCachedData(self, serviceRecord):
+        pass  # No cached data...
