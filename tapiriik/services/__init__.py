@@ -42,6 +42,10 @@ from tapiriik.services.PolarFlow import PolarFlowService
 PolarFlow = PolarFlowService()
 from tapiriik.services.Movescount import MovescountService
 Movescount = MovescountService()
+from tapiriik.services.DecathlonCoach import DecathlonCoachService
+DecathlonCoach = DecathlonCoachService()
+from tapiriik.services.PolarPersonalTrainer import PolarPersonalTrainerService
+PolarPersonalTrainer = PolarPersonalTrainerService()
 
 PRIVATE_SERVICES = []
 try:

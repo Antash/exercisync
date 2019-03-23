@@ -65,6 +65,7 @@ class GarminConnectService(ServiceBase):
                                 "rock_climbing": ActivityType.Climbing,
                                 "mountaineering": ActivityType.Climbing,
                                 "strength_training": ActivityType.StrengthTraining,
+                                "stand_up_paddleboarding": ActivityType.StandUpPaddling,
                                 "all": ActivityType.Other,  # everything will eventually resolve to this
                                 "multi_sport": ActivityType.Other # Most useless type? You decide!
     }
@@ -84,6 +85,7 @@ class GarminConnectService(ServiceBase):
                                 "fitness_equipment": ActivityType.Gym,
                                 "rock_climbing": ActivityType.Climbing,
                                 "strength_training": ActivityType.StrengthTraining,
+                                "stand_up_paddleboarding": ActivityType.StandUpPaddling,
                                 "other": ActivityType.Other  # I guess? (vs. "all" that is)
     }
 
@@ -114,7 +116,8 @@ class GarminConnectService(ServiceBase):
         "rpm": ActivityStatisticUnit.RevolutionsPerMinute,
         "watt": ActivityStatisticUnit.Watts,
         "second": ActivityStatisticUnit.Seconds,
-        "ms": ActivityStatisticUnit.Milliseconds
+        "ms": ActivityStatisticUnit.Milliseconds,
+        "mps": ActivityStatisticUnit.MetersPerSecond
     }
 
     _obligatory_headers = {
@@ -124,11 +127,19 @@ class GarminConnectService(ServiceBase):
     def __init__(self):
         cachedHierarchy = cachedb.gc_type_hierarchy.find_one()
         if not cachedHierarchy:
-            rawHierarchy = requests.get("https://connect.garmin.com/proxy/activity-service-1.2/json/activity_types", headers=self._obligatory_headers).text
-            self._activityHierarchy = json.loads(rawHierarchy)["dictionary"]
+            rawHierarchy = requests.get("https://connect.garmin.com/modern/proxy/activity-service/activity/activityTypes", headers=self._obligatory_headers).text
+            self._activityHierarchy = json.loads(rawHierarchy)
             cachedb.gc_type_hierarchy.insert({"Hierarchy": rawHierarchy})
         else:
-            self._activityHierarchy = json.loads(cachedHierarchy["Hierarchy"])["dictionary"]
+            self._activityHierarchy = json.loads(cachedHierarchy["Hierarchy"])
+            
+        # hashmaps for determining parent type key
+        self._typeKeyParentMap = {}
+        self._typeIdKeyMap = {}        
+        for x in self._activityHierarchy:
+            self._typeKeyParentMap[x["typeKey"]] = x["parentTypeId"]
+            self._typeIdKeyMap[x["typeId"]] = x["typeKey"] 
+            
         rate_lock_path = tempfile.gettempdir() + "/gc_rate.%s.lock" % HTTP_SOURCE_ADDR
         # Ensure the rate lock file exists (...the easy way)
         open(rate_lock_path, "a").close()
@@ -284,7 +295,7 @@ class GarminConnectService(ServiceBase):
         # But maybe they'll change that some day?
         while act_type not in self._activityMappings:
             try:
-                act_type = [x["parent"]["key"] for x in self._activityHierarchy if x["key"] == act_type][0]
+                act_type = self._typeIdKeyMap[self._typeKeyParentMap[act_type]]
             except IndexError:
                 raise ValueError("Activity type not found in activity hierarchy")
         return self._activityMappings[act_type]
@@ -440,85 +451,14 @@ class GarminConnectService(ServiceBase):
             # Nothing else to download
             return activity
 
-        # https://connect.garmin.com/proxy/activity-service-1.3/json/activityDetails/####
+        # https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/###
         activityID = activity.ServiceData["ActivityID"]
-        res = self._request_with_reauth(lambda session: session.get("https://connect.garmin.com/modern/proxy/activity-service-1.3/json/activityDetails/" + str(activityID) + "?maxSize=999999999"), serviceRecord)
+        res = self._request_with_reauth(lambda session: session.get("https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/{}".format(activityID)), serviceRecord)
         try:
-            raw_data = res.json()["com.garmin.activity.details.json.ActivityDetails"]
+            tcx_data = res.text
+            activity = TCXIO.Parse(tcx_data.encode('utf-8'), activity)
         except ValueError:
             raise APIException("Activity data parse error for %s: %s" % (res.status_code, res.text))
-
-        if "measurements" not in raw_data:
-            activity.Stationary = True # We were wrong, oh well
-            return activity
-
-        attrs_map = {}
-        def _map_attr(gc_key, wp_key, units, in_location=False, is_timestamp=False):
-            attrs_map[gc_key] = {
-                "key": wp_key,
-                "to_units": units,
-                "in_location": in_location, # Blegh
-                "is_timestamp": is_timestamp # See above
-            }
-
-        _map_attr("directSpeed", "Speed", ActivityStatisticUnit.MetersPerSecond)
-        _map_attr("sumDistance", "Distance", ActivityStatisticUnit.Meters)
-        _map_attr("directHeartRate", "HR", ActivityStatisticUnit.BeatsPerMinute)
-        _map_attr("directBikeCadence", "Cadence", ActivityStatisticUnit.RevolutionsPerMinute)
-        _map_attr("directDoubleCadence", "RunCadence", ActivityStatisticUnit.StepsPerMinute) # 2*x mystery solved
-        _map_attr("directAirTemperature", "Temp", ActivityStatisticUnit.DegreesCelcius)
-        _map_attr("directPower", "Power", ActivityStatisticUnit.Watts)
-        _map_attr("directElevation", "Altitude", ActivityStatisticUnit.Meters, in_location=True)
-        _map_attr("directLatitude", "Latitude", None, in_location=True)
-        _map_attr("directLongitude", "Longitude", None, in_location=True)
-        _map_attr("directTimestamp", "Timestamp", None, is_timestamp=True)
-
-        # Figure out which metrics we'll be seeing in this activity
-        attrs_indexed = {}
-        for measurement in raw_data["measurements"]:
-            key = measurement["key"]
-            if key in attrs_map:
-                if attrs_map[key]["to_units"]:
-                    attrs_map[key]["from_units"] = self._unitMap[measurement["unit"]]
-                    if attrs_map[key]["to_units"] == attrs_map[key]["from_units"]:
-                        attrs_map[key]["to_units"] = attrs_map[key]["from_units"] = None
-                attrs_indexed[measurement["metricsIndex"]] = attrs_map[key]
-
-        # Process the data frames
-        frame_idx = 0
-        active_lap_idx = 0
-        for frame in raw_data["metrics"]:
-            wp = Waypoint()
-            for idx, attr in attrs_indexed.items():
-                value = frame["metrics"][idx]
-                target_obj = wp
-                if attr["in_location"]:
-                    if not wp.Location:
-                        wp.Location = Location()
-                    target_obj = wp.Location
-
-                # Handle units
-                if attr["is_timestamp"]:
-                    value = pytz.utc.localize(datetime.utcfromtimestamp(value / 1000))
-                elif attr["to_units"]:
-                    value = ActivityStatistic.convertValue(value, attr["from_units"], attr["to_units"])
-
-                # Write the value (can't use __dict__ because __slots__)
-                setattr(target_obj, attr["key"], value)
-
-            # Fix up lat/lng being zero (which appear to represent missing coords)
-            if wp.Location and wp.Location.Latitude == 0 and wp.Location.Longitude == 0:
-                wp.Location.Latitude = None
-                wp.Location.Longitude = None
-            # Please visit a physician before complaining about this
-            if wp.HR == 0:
-                wp.HR = None
-            # Bump the active lap if required
-            while (active_lap_idx < len(activity.Laps) - 1 and # Not the last lap
-                   activity.Laps[active_lap_idx + 1].StartTime <= wp.Timestamp):
-                active_lap_idx += 1
-            activity.Laps[active_lap_idx].Waypoints.append(wp)
-            frame_idx += 1
 
         return activity
 

@@ -1,11 +1,12 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% load services %}
 {% load users %}
 {% load displayutils %}
 {% block title %}activities{% endblock %}
 
 {% block content %}
-<h1>Your activities</h1>
+<h1>{% trans "Your activities" %}</h1>
 <div ng-controller="ActivitiesController">
 	<table class="fancyTable activitiesTable">
 		<tr class="headers">
@@ -15,16 +16,16 @@
 		<tr class="activity" ng-class="{fullySynchronized: activity.FullySynchronized}" ng-repeat-start="activity in activities" ng-click="activity.ShowDetail = !activity.ShowDetail">
 			<td class="activityHeader">
 				<span class="date" title="{[ activity.StartTime ]}">{[ activity.StartTime|date ]}</span> {[ activity.Name ]}
-				<span class="tag mini private" title="You've marked this activity as private." ng-show="activity.Private">Private</span><span class="tag mini stationary" title="This activity has no sensor data." ng-show="activity.Stationary">Stationary</span>
+				<span class="tag mini private" title="You've marked this activity as private." ng-show="activity.Private">Private</span><span class="tag mini stationary" title="This activity has no sensor data." ng-show="activity.Stationary">{% trans "Stationary" %}</span>
 				<span class="tag float type">{[ activity.Type ]}</span>
 			</td>
-			<td ng-repeat="prescence in activity.Prescence" class="prescence-cell"><span class="prescence" ng-class="{present: prescence.Present, absent: !prescence.Present}">Present</span></td>
+			<td ng-repeat="prescence in activity.Prescence" class="prescence-cell"><span class="prescence" ng-class="{present: prescence.Present, absent: !prescence.Present}">{% trans "Present" %}</span></td>
 		</tr>
 		<tr class="activityDetail" ng-repeat-end ng-show="activity.ShowDetail && !activity.FullySynchronized">
 			<td colspan="8">
 				<span class="disclosure"></span>
 				<span ng-hide="activity.FullySynchronized">
-					<p>This activity was not synchronized to the following services:</p>
+					<p>{% trans "This activity was not synchronized to the following services:" %}</p>
 					<ul>
 						<li ng-repeat="absence in activity.Prescence|filter:{Present:false}">
 							<b>{[ DisplayNameByService(absence.Service) ]}</b>: {[ ExceptionExplanation(absence) ]}
@@ -34,8 +35,8 @@
 			</td>
 		</tr>
 	</table>
-	<div class="activitiesTable-empty-message" ng-show="!loading && activities.length == 0"><h2>exercisync doesn't know about any activities in your accounts</h2>Have you synchronized lately?</div>
-	<div class="activitiesTable-empty-message" ng-show="loading"><h2>Loading...</h2></div>
-	<p><b>If your account is currently synchronizing</b>, those activities will appear here once the synchronization completes. All dates shown are in UTC.</p>
+	<div class="activitiesTable-empty-message" ng-show="!loading && activities.length == 0"><h2>{% trans "exercisync doesn't know about any activities in your accounts" %}</h2>{% trans "Have you synchronized lately?" %}</div>
+	<div class="activitiesTable-empty-message" ng-show="loading"><h2>{% trans "Loading..." %}</h2></div>
+	<p>{% trans "<b>If your account is currently synchronizing</b>, those activities will appear here once the synchronization completes. All dates shown are in UTC." %}</p>
 </div>
 {% endblock %}

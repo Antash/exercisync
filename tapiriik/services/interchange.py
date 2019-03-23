@@ -23,6 +23,7 @@ class ActivityType:  # taken from RK API docs. The text values have no meaning e
     Climbing = "Climbing"
     RollerSkiing = "RollerSkiing"
     StrengthTraining = "StrengthTraining"
+    StandUpPaddling = "StandUpPaddling"
     Other = "Other"
 
     def List():
@@ -58,7 +59,7 @@ class ActivityType:  # taken from RK API docs. The text values have no meaning e
 
 
 class Activity:
-    def __init__(self, startTime=None, endTime=None, actType=ActivityType.Other, distance=None, name=None, notes=None, tz=None, lapList=None, private=False, fallbackTz=None, stationary=None, gps=None, device=None, sourceFile=None):
+    def __init__(self, startTime=None, endTime=None, actType=ActivityType.Other, distance=None, name=None, notes=None, tz=None, lapList=None, private=False, fallbackTz=None, stationary=None, gps=None, device=None):
         self.StartTime = startTime
         self.EndTime = endTime
         self.Type = actType
@@ -73,7 +74,6 @@ class Activity:
         self.GPS = gps
         self.PrerenderedFormats = {}
         self.Device = device
-        self.SourceFile = sourceFile
 
     def CalculateUID(self):
         if not self.StartTime:
@@ -355,19 +355,6 @@ class Activity:
 
     def __le__(self, other):
         return not self.__gt__(other)
-
-class ActivityFileType:
-    FIT = ".fit"
-    TCX = ".tcx"
-    GPX = ".gpx"
-
-class SourceFile:
-    def __init__(self, textContent, contentType):
-        self._textContent = textContent
-        self._contentType = contentType
-
-    def getContent(self, contentType):        
-        return self._textContent if self._contentType is contentType else None
 
 class UploadedActivity (Activity):
     pass  # will contain list of which service instances contain this activity - not really merited

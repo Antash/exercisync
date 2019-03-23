@@ -3,7 +3,7 @@
 from tapiriik.settings import WEB_ROOT, POLAR_CLIENT_SECRET, POLAR_CLIENT_ID, POLAR_RATE_LIMITS
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.api import APIException, UserException, UserExceptionType
-from tapiriik.services.interchange import UploadedActivity, ActivityType, ActivityStatistic, ActivityStatisticUnit, SourceFile, ActivityFileType
+from tapiriik.services.interchange import UploadedActivity, ActivityType, ActivityStatistic, ActivityStatisticUnit
 from tapiriik.services.tcx import TCXIO
 
 from datetime import datetime, timedelta
@@ -66,20 +66,50 @@ class PolarFlowService(ServiceBase):
     # Polar Flow -> common
     _reverse_activity_type_mappings = {
         "RUNNING": ActivityType.Running,
+        "JOGGING": ActivityType.Running,
+        "ROAD_RUNNING": ActivityType.Running,
+        "TRACK_AND_FIELD_RUNNING": ActivityType.Running,
+        "TRAIL_RUNNING": ActivityType.Running,
+        "TREADMILL_RUNNING": ActivityType.Running,
+
         "CYCLING": ActivityType.Cycling,
+        "ROAD_BIKING": ActivityType.Cycling,
+        "INDOOR_CYCLING": ActivityType.Cycling,
+
         "MOUNTAIN_BIKING": ActivityType.MountainBiking,
+
         "WALKING": ActivityType.Walking,
         "HIKING": ActivityType.Hiking,
         "DOWNHILL_SKIING": ActivityType.DownhillSkiing,
         "CROSS-COUNTRY_SKIING": ActivityType.CrossCountrySkiing,
         "SNOWBOARDING": ActivityType.Snowboarding,
         "SKATING": ActivityType.Skating,
+
         "SWIMMING": ActivityType.Swimming,
+        "OPEN_WATER_SWIMMING": ActivityType.Swimming,
+        "POOL_SWIMMING": ActivityType.Swimming,
+
         "PARASPORTS_WHEELCHAIR": ActivityType.Wheelchair,
         "ROWING": ActivityType.Rowing,
+        "INDOOR_ROWING": ActivityType.Rowing,
         "STRENGTH_TRAINING": ActivityType.StrengthTraining,
+
         "OTHER_INDOOR": ActivityType.Other,
         "OTHER_OUTDOOR": ActivityType.Other,
+
+        "ROLLER_SKIING_CLASSIC": ActivityType.RollerSkiing,
+        "ROLLER_SKIING_FREESTYLE": ActivityType.RollerSkiing,
+
+        # not supported somehow
+        #"": ActivityType.Elliptical,
+
+        "FUNCTIONAL_TRAINING": ActivityType.Gym,
+        "CORE": ActivityType.Gym,
+        "GROUP_EXERCISE": ActivityType.Gym,
+        "PILATES": ActivityType.Gym,
+        "YOGA": ActivityType.Gym,
+
+        "VERTICALSPORTS_WALLCLIMBING": ActivityType.Climbing,
     }
 
     SupportedActivities = list(_activity_type_mappings.keys())
@@ -209,7 +239,7 @@ class PolarFlowService(ServiceBase):
     def _create_activity(self, activity_data):
         activity = UploadedActivity()
 
-        activity.Stationary = not activity_data["has-route"]
+        activity.GPS = not activity_data["has-route"]
         if "detailed-sport-info" in activity_data and activity_data["detailed-sport-info"] in self._reverse_activity_type_mappings:
             activity.Type = self._reverse_activity_type_mappings[activity_data["detailed-sport-info"]]
         else:
@@ -243,13 +273,12 @@ class PolarFlowService(ServiceBase):
         response = requests.get(tcx_url, headers=self._api_headers(serviceRecord, {"Accept": "application/vnd.garmin.tcx+xml"}))
         if response.status_code == 404:
             # Transaction was disbanded, all data linked to it will be returned in next transaction
-            raise APIException("Transaction disbanded", block=True, user_exception=UserException(UserExceptionType.DownloadError))
+            raise APIException("Transaction disbanded", user_exception=UserException(UserExceptionType.DownloadError))
         try:
             tcx_data = response.text
             activity = TCXIO.Parse(tcx_data.encode('utf-8'), activity)
-            activity.SourceFile = SourceFile(tcx_data, ActivityFileType.TCX)
         except lxml.etree.XMLSyntaxError:
-            logger.debug("Cannot recieve training tcx at url: {}".format(tcx_url))
+            raise APIException("Cannot recieve training tcx at url: {}".format(tcx_url), user_exception=UserException(UserExceptionType.DownloadError))
         return activity
 
     def SynchronizationComplete(self, serviceRecord):

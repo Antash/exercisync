@@ -1,15 +1,17 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% load displayutils %}
 {% block title %}contact{% endblock %}
 {% block content %}
 <div class="contactBlock">
-	<h1>For system status updates</h1>
-	<a href="http://aerobia.ru/clubs/425" target="_new" class="large">exercisync group on aerobia.ru</a>
+	<h1>{% trans "For system status updates" %}</h1>
+	<a href="http://aerobia.ru/clubs/425" target="_new" class="large">{% trans "exercisync group on aerobia.ru" %}</a>
 </div>
 <div class="contactBlock">
-	<h1>For help with your account</h1>
-	<p>If you are having issues with your account, <b>please check <a href="{% url 'activities_dashboard' %}">the activity dashboard</a></b> - it'll do its best to tell you what went wrong.</p>
+	<h1>{% trans "For help with your account" %}</h1>
+	<p>{% trans "If you are having issues with your account" %}, <b>{% trans "please check" %} <a href="{% url 'activities_dashboard' %}">{% trans "the activity dashboard" %}</a></b> - {% trans "it'll do its best to tell you what went wrong" %}.</p>
 	<a href="mailto:help@exercisync.com{% if user %}?body=My exercisync user ID is {{ user|dict_get:'_id' }}{% endif %}" target="_blank" class="large">help@exercisync.com</a>
-	<p>If you're dissatisfied with the service and want a refund, make sure to mention that in the subject line so I can respond quickly.</p>
+	<p>{% trans "If you're dissatisfied with the service and want a refund, make sure to mention that in the subject line so I can respond quickly." %}</p>
+	<p>{% trans "If you are making an enquiry regarding the European Union's General Data Protection Regulation, please mention &quot;GDPR&quot; in the subject line." %}</p>
 </div>
 {% endblock %}

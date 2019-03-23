@@ -1,6 +1,7 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% block title %}payment processed{% endblock %}
 {% block content %}
-<h1>Thanks!</h1>
-<p>Your exercisync account is now set up for automatic synchronization. You can <a href="{% url 'dashboard' %}">head back to the dashboard</a> or close this window.</p>
+<h1>{% trans "Thanks" %}!</h1>
+<p>{% trans "Your exercisync account is now set up for automatic synchronization. You can " %}<a href="{% url 'dashboard' %}">{% trans "head back to the dashboard" %}</a> {% trans "or close this window" %}.</p>
 {% endblock %}

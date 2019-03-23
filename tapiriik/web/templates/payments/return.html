@@ -1,8 +1,9 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% block title %}payment return{% endblock %}
 {% block head %}<meta http-equiv="refresh" content="3">{% endblock %}
 {% block content %}
-<h1>Please hold...</h1>
-<p>(we're waiting for PayPal)</p>
-<p><b>If you made an eCheque payment</b>, your account will be credited once the payment clears (so you can <a href="{% url 'dashboard' %}">return to the dashboard</a> right away).</p>
+<h1>{% trans "Please hold" %}...</h1>
+<p>({% trans "we're waiting for PayPal" %})</p>
+<p><b>{% trans "If you made an eCheque payment" %}</b>, {% trans "your account will be credited once the payment clears (so you can" %} <a href="{% url 'dashboard' %}">{% trans "return to the dashboard" %}</a> {% trans "right away" %}).</p>
 {% endblock %}

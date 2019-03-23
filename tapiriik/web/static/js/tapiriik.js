@@ -43,6 +43,14 @@ tapiriik.Init = function(){
 		}
 	});
 
+	$(".donateForm").hide();
+	$(".donateButton").show();
+	$(".donateButton").click(function(){
+		$(".donateButton").slideUp();
+		$(".donateForm").slideDown();
+		return false;
+	});
+
 	$(".paymentForm").hide();
 	$(".paymentButton").show();
 	$(".paymentButton").click(function(){

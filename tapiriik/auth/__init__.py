@@ -14,7 +14,8 @@ class User:
     ConfigurationDefaults = {
         "suppress_auto_sync": False,
         "sync_upload_delay": 0,
-        "sync_skip_before": None
+        "sync_skip_before": None,
+        "historical_sync": False
     }
     def Get(id):
         return db.users.find_one({"_id": ObjectId(id)})
@@ -180,6 +181,7 @@ class User:
             for user in activeUsers:
                 if len(user["ConnectedServices"]) - 1 == 0:
                     # I guess we're done here?
+                    db.activity_records.remove({"UserID": user["_id"]})
                     db.users.remove({"_id": user["_id"]})
 
     def AuthByService(serviceRecord):

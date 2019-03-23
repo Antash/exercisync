@@ -1,8 +1,19 @@
+{% load i18n %}
 {% load displayutils %}
 {% load pipeline %}
 <!DOCTYPE html>
 <html>
 <head>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-119126001-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-119126001-1');
+	</script>
+	
 	<meta http-equiv="Content-Type" value="text/html; charset=UTF-8">
 	<meta name="Description" content="Automatically synchronize your fitness activities between Garmin Connect, Runkeeper, Strava and more.">
 	<meta name="Keywords" content="automatic, synchronize, sync, update, copy, transfer, download, back up, export, fitness, garmin, garmin connect, runkeeper, strava, endomondo, sporttracks, trainingpeaks, ridewithgps, ride with gps, training peaks, dropbox, trainerroad, motivato, velohero, epson, runsense, path, track, heart rate, free, service, gpx, tcx, health, data, service, cycling, running, swimming, walking, what other activities can I put here?, underwater basket weaving, why are you reading the SEO keywords anyways, move along, nothing to see here">
@@ -22,8 +33,15 @@
     <title>{% block site_title %}{% block title %}dashboard{% endblock %} &bull; exercisync{% endblock %}</title>
 
     <meta name="viewport" content="width=device-width">
-    {% block head %}{% endblock %}
-    <link rel="icon" type="image/png" href="{{ STATIC_URL }}img/favicon.png">
+	{% block head %}{% endblock %}
+
+	<link rel="apple-touch-icon" sizes="180x180" href="{{ STATIC_URL }}img/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="{{ STATIC_URL }}img/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="{{ STATIC_URL }}img/favicon-16x16.png">
+	<link rel="manifest" href="{{ STATIC_URL }}site.webmanifest">
+	<link rel="mask-icon" href="{{ STATIC_URL }}img/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="theme-color" content="#ffffff">
 </head>
 
 <body {% if celebration_mode %}class="{{ celebration_mode.BodyCSSClasses }}"{% endif %} ng-app="tapiriik">
@@ -41,7 +59,7 @@
 					{% if celebration_mode.Subtitle %}
 						<div class="sub">{{ celebration_mode.Subtitle }}</div>
 					{% else %}
-						<div class="sub">when kudos on strava is not enough</div>
+						<div class="sub">{% trans "when kudos on strava is not enough" %}</div>
 					{% endif %}
 				</div>
 				<div class="logoPad"></div>
@@ -50,8 +68,8 @@
 		    			{% block content %}{% endblock %}
 		    		</div>
 	    		</div>
-	    		<div class="footers"><a href="{% url 'faq' %}">FAQ</a> | <a href="{% url 'privacy' %}">Privacy</a> | <a href="{% url 'credits' %}">Credits</a>{% if user %} | <a href="#" onclick="tapiriik.Logout();">Log out</a>{% endif %}<br/><span style="font-size:95%;font-weight:normal">All trademarks displayed are property of their respective owners</br>
-	    			<a href="http://aerobia.ru/clubs/425" target="_blank">exercisync</a> is an <a href="https://github.com/antash/exercisync" target="_blank">open source project</a> by <a href="{% url 'contact' %}">Anton Ashmarin</a>
+	    		<div class="footers"><a href="{% url 'faq' %}">{% trans "FAQ" %}</a> | <a href="{% url 'privacy' %}">{% trans "Privacy" %}</a> | <a href="{% url 'credits' %}">{% trans "Credits" %}</a>{% if user %} | <a href="#" onclick="tapiriik.Logout();">{% trans "Log out" %}</a>{% endif %}<br/><span style="font-size:95%;font-weight:normal">{% trans "All trademarks displayed are property of their respective owners" %}</br>
+	    			<a href="http://aerobia.ru/clubs/425" target="_blank">exercisync</a> {% trans "is an" %} <a href="https://github.com/antash/exercisync" target="_blank">{% trans "open source project" %}</a> {% trans "by" %} <a href="{% url 'contact' %}">{% trans "Anton Ashmarin" %}</a>
 	    		</div>
 	    	</div>
     	</div>
@@ -71,17 +89,6 @@
 
 	<script type="text/javascript">
 	{% include "js-bridge.js" %}
-
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-39083873-1']);
-	_gaq.push(['_trackPageview']);
-	_gaq.push(['_setDomainName', 'none']);
-	(function() {
-	  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
-
 	</script>
 </body>
 </html>

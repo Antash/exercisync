@@ -241,11 +241,19 @@ class TCXIO:
             sum_stats.update(act.Stats)
             act.Stats = sum_stats
 
+        try:
+            act.PrerenderedFormats["tcx"] = tcxData.decode('utf-8')
+        except:
+            act.PrerenderedFormats["tcx"] = tcxData
+
         act.CalculateUID()
         return act
     
     def Dump(activity, activityType=None):
 
+        if "tcx" in activity.PrerenderedFormats:
+            return activity.PrerenderedFormats["tcx"]
+            
         root = etree.Element("TrainingCenterDatabase", nsmap=TCXIO.Namespaces)
         activities = etree.SubElement(root, "Activities")
         act = etree.SubElement(activities, "Activity")

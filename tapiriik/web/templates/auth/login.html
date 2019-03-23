@@ -1,14 +1,15 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% block title %}login{% endblock %}
 {% block content %}
 {% if res != None and res == false %}
-<div class="error">There was a problem logging you into {{ service.DisplayName }}</div>
+<div class="error">{% trans "There was a problem logging you into" %} {{ service.DisplayName }}</div>
 {% endif %}
-You're logging into {{ serviceid }}
+{% trans "You're logging into" %} {{ serviceid }}
 <form action="{% url 'auth_simple' service=serviceid %}" method="post">
 <input name="username"/>
 <input name="password" type="password"/>
-<label for="persist">Remember these details</label>
+<label for="persist">{% trans "Remember these details" %}</label>
 <input name="persist" id="persist" type="checkbox"/>
 <input type="submit"/>
 {% csrf_token %}

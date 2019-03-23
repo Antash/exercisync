@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="syncSettingsBlock" ng-controller="SyncSettingsController" style="display:none">
 	<div class="internalPopover">
 		<div class="popoverOuterBorder">
@@ -6,22 +7,26 @@
 				<form>
 					<div class="syncSettingsCloze">
 						<span ng-show="tapiriik.User.AutoSyncActive">
-							Check for new activities
+							{% trans "Check for new activities" %}
 							<div class="selectWrap">
 								<select ng-model="tapiriik.User.Config.suppress_auto_sync" ng-options="opt.k as opt.v for opt in sync_suppress_options">
 								</select>
 							</div>.
 						</span>
-						Upload activities
+						{% trans "Upload activities" %}
 						<div class="selectWrap">
 							<select ng-model="tapiriik.User.Config.sync_upload_delay" ng-options="opt.k as opt.v for opt in sync_delay_options">
 							</select>
 						</div>
-						after they finish, but skip them if they happened before
+						{% trans "after they finish, but skip them if they happened" %}
+						<div class="selectWrap">
+							<select ng-model="tapiriik.User.Config.historical_sync" ng-options="opt.k as opt.v for opt in historical_sync_options">
+							</select>
+						</div>
 						<input type="text" placeholder="16 Nov 1885" ng-model="sync_skip_before_entry" class="js-datepicker">.
 					</div>
 					<div style="text-align:center;">
-						<button class="syncSettingsSaveButton" ng-click="save()">Save</button>
+						<button class="syncSettingsSaveButton" ng-click="save()">{% trans "Save" %}</button>
 					</div>
 				</form>
 			</div>

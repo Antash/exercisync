@@ -29,9 +29,13 @@ def privacy(request):
     services["beginnertriathlete"].update({"email": OPTIN, "password": OPTIN, "tokens": NO, "metadata": YES, "data": NO})
     #services["trainasone"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
     #services["pulsstory"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
+    #services["setio"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
+    #services["singletracker"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
     services["aerobia"].update({"email": OPTIN, "password": OPTIN, "tokens": NO, "metadata": YES, "data":NO})
     services["polarflow"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
     services["movescount"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
+    services["decathloncoach"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
+    services["polarpersonaltrainer"].update({"email": YES, "password": YES, "tokens": NO, "metadata": YES, "data":NO})
 
     for svc_id in SOFT_LAUNCH_SERVICES:
         if svc_id in services:

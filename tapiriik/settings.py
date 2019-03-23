@@ -1,6 +1,8 @@
 import os
 import sys
 from datetime import datetime
+from django.utils.translation import ugettext_lazy as _
+
 # Django settings for tapiriik project.
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,6 +29,16 @@ TIME_ZONE = 'America/Chicago'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('fr', _('French')),
+    ('ru', _('Russian')),
+)
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'tapiriik/locale'),
+)
 
 SITE_ID = 1
 
@@ -105,6 +117,9 @@ PIPELINE_CSS = {
     },
 }
 
+PIPELINE_CSS_COMPRESSOR  = 'pipeline.compressors.cssmin.CSSMinCompressor'
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.jsmin.JSMinCompressor'
+
 PIPELINE_DISABLE_WRAPPER = True
 
 # Make this unique, and don't share it with anybody.
@@ -123,8 +138,9 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'tapiriik.web.startup.Startup',
@@ -156,7 +172,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'tapiriik.web.context_processors.stats',
     'tapiriik.web.context_processors.providers',
     'tapiriik.web.context_processors.celebration_mode',
-    'django.core.context_processors.static',)
+    'django.core.context_processors.static',
+    'django.template.context_processors.i18n')
 
 INSTALLED_APPS = (
     'django.contrib.sessions',

@@ -1,0 +1,20 @@
+{% load i18n %}
+{% load displayutils %}
+<button style="margin:auto;display:block;overflow:hidden;" class="donateButton">{% trans "Support the project" %}</button>
+<form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml" class="donateForm" style="text-align:center;display:none;">    
+    <hr/>
+    <h4>{% trans "Do you like the service and you want it to get even better?" %}</h4>
+    <p>{% trans "Exercisync is free and open service, but development, support users, server maintenance - all this requires my efforts. Thank you for your contribution to the development of the service!" %}</p>
+    <input type="hidden" name="receiver" value="410011406172912">    
+    <input type="hidden" name="formcomment" value="exercisync.com - синхронизация тренировок">    
+    <input type="hidden" name="short-dest" value="exercisync.com - синхронизация тренировок">   
+    <input type="hidden" name="quickpay-form" value="donate">
+    <span style="font-size: 150%;">&#8381;</span> <input name="sum" value="100" data-type="number" style="width:100px; text-align:center;">
+    <input type="hidden" name="targets" value="На развитие проекта.">
+
+    <label><input type="radio" name="paymentType" value="PC">{% trans "Yandex.Money" %}</label>
+    <label><input type="radio" name="paymentType" value="AC">{% trans "By bank card" %}</label>
+    <label><input type="radio" name="paymentType" value="MC">{% trans "From mobile balance" %}</label>
+    <button type="submit">{% trans "Support the project" %}</button>
+</form>
+<noscript><style type="text/css">.donateForm {display:block !important;}</style></noscript>

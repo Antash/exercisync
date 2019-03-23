@@ -1,6 +1,7 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% block title %}payment reclaim error{% endblock %}
 {% block content %}
-<h1>Invalid payment claim code</h1>
-Please contact me if you're confused.
+<h1>{% trans "Invalid payment claim code" %}</h1>
+{% trans "Please contact me if you're confused." %}
 {% endblock %}

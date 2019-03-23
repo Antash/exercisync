@@ -1,20 +1,21 @@
 {% extends "site.html" %}
+{% load i18n %}
 {% load services %}
 {% load users %}
 {% load displayutils %}
-{% block title %}{% if user != none %}dashboard{% else %}sync your runs, rides & more{% endif %}{% endblock %}
+{% block title %}{% if user != none %}{% trans "dashboard" %}{% else %}{% trans "sync your runs, rides & more" %}{% endif %}{% endblock %}
 
 {% block content %}
 {% if user != none %}
 		{% if user.Substitute %}
-		<h1>Substituting user</h1>
-		<a href="{% url 'diagnostics_unsu' %}">Return</a>
+		<h1>{% trans "Substituting user" %}</h1>
+		<a href="{% url 'diagnostics_unsu' %}">{% trans "Return" %}</a>
 		<hr/>
 		{% endif %}
 		{% if user.ConnectedServices|length > 1 %}
-			{% infotip connectedWillSync %}Connected services will be synchronized {% if user|has_active_payment %}automatically{% else %}when you click Synchronize now{% endif %}{% endinfotip %}
+			{% infotip connectedWillSync %}{% trans "Connected services will be synchronized" %} {% if user|has_active_payment %}{% trans "automatically" %}{% else %}{% trans "when you click Synchronize now" %}{% endif %}{% endinfotip %}
 		{% else %}
-			{% infotip connectOneMore %}Connect a second service to synchronize your activities to &amp; from{% endinfotip %}
+			{% infotip connectOneMore %}{% trans "Connect a second service to synchronize your activities to &amp; from" %}{% endinfotip %}
 		{% endif %}
 		<div class="serviceButtonOuter">
 			<div class="serviceButtonWrap">
@@ -29,19 +30,19 @@
 		</div>
 	{% if user.ConnectedServices|length > 1 %}
 		<div class="syncButtonBlock">
-			<div class="syncButtonAttachment left">Queueing to Synchronize</div><div class="syncButtonWrap"><a class="syncButton">Synchronize Now<div class="syncButtonIcon"></div></a><a href="#/settings" class="syncSettingsNubbin"><span class="sr">Synchronization Settings</span><div class="syncSettingsNubbinIcon"></div></a></div><div class="syncButtonAttachment right">Attached info 10%</div>
+			<div class="syncButtonAttachment left">{% trans "Queueing to Synchronize" %}</div><div class="syncButtonWrap"><a class="syncButton">{% trans "Synchronize Now" %}<div class="syncButtonIcon"></div></a><a href="#/settings" class="syncSettingsNubbin"><span class="sr">{% trans "Synchronization Settings" %}</span><div class="syncSettingsNubbinIcon"></div></a></div><div class="syncButtonAttachment right">{% trans "Attached info 10%" %}</div>
 		</div>
 		{% include "settings-block.html" %}
 
 		{% if user.NonblockingSyncErrorCount > 0 %}
-			<a href="{% url 'activities_dashboard' %}" style="color:#aaa; font-size:80%;">Some activities could not be synchronized.</a><br/>
+			<a href="{% url 'activities_dashboard' %}" style="color:#aaa; font-size:80%;">{% trans "Some activities could not be synchronized." %}</a><br/>
 		{% endif %}
-
+ 
 		{% if user|has_active_payment %}
 		{% else %}
 			{% include "payment.html" %}
 		{% endif %}
-
+		
 		{% for connection in user.ConnectedServices|svc_populate_conns %}
 			{% with svc=connection.Service %}
 				{% for error in connection.SyncErrors %}
@@ -57,19 +58,22 @@
 
 	{% for provider in user.ConnectedServices|svc_providers_except %}
 		{% if provider.ID not in config.soft_launch and provider.ID not in config.withdrawn_services %}
-			{% if forloop.first %}<hr>{% infotip connectMore %}You can synchronize more services by connecting them below{% endinfotip %}{% endif %}
+			{% if forloop.first %}<hr>{% infotip connectMore %}{% trans "You can synchronize more services by connecting them below" %}{% endinfotip %}{% endif %}
 			{% include "service-button.html" with provider=provider inactive=True %}
 		{% endif %}
 	{% endfor %}
 
 {% else %}
-<p class="splashPreamble">exercisync synchronizes your activities between Aerobia, Garmin Connect, Polar Flow, Movescount, Strava, RideWithGPS, Dropbox, Smashrun and BeginnerTriathlete<br/>
-(your heart rate, cadence, power, and temperature data syncs too)</p>
+<p class="splashPreamble">{% trans "exercisync synchronizes your activities between Aerobia, Garmin Connect, Polar Flow, PolarPersonalTrainer, Suunto, Strava, RideWithGPS, Dropbox, Smashrun and BeginnerTriathlete<br/>	(your heart rate, cadence, power, and temperature data syncs too)" %}</p>
 	{% for provider in service_providers %}
 		{% if provider.ID not in config.soft_launch and provider.ID not in config.withdrawn_services %}
 			{% include "service-button.html" with provider=provider %}
 		{% endif %}
 	{% endfor %}
-<p class="splashPreamble">Your email, password, and fitness data are kept safe - full details on the <a href="{% url "privacy" %}">privacy page</a>.</p>
+	{% infotip ServiceNotListed %}{% trans "Did not find your service?" %} - {% trans "Try here" %}: <a id="tapiriikLink" href="https://tapiriik.com">tapiriik.com</a>{% endinfotip %}
+<p class="splashPreamble">{% trans "Your email, password, and fitness data are kept safe - full details on the" %} <a href="{% url "privacy" %}">{% trans "privacy page" %}</a>.</p>
 {% endif %}
+
+{% include "donation.html" %}
+
 {% endblock %}

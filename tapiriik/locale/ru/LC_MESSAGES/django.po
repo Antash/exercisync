@@ -1,0 +1,992 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-04 18:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: .\tapiriik\settings.py:34
+msgid "English"
+msgstr "Английский"
+
+#: .\tapiriik\settings.py:35
+msgid "French"
+msgstr "Французский"
+
+#: .\tapiriik\settings.py:36
+msgid "Russian"
+msgstr "Русский"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:9
+msgid "Your activities"
+msgstr "Ваши тренировки"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:19
+msgid "Stationary"
+msgstr "Стационарная"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:22
+msgid "Present"
+msgstr "Существующая"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:28
+msgid "This activity was not synchronized to the following services:"
+msgstr "Эта тренировка не была синхронизирована в эти сервисы:"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:38
+msgid "exercisync doesn't know about any activities in your accounts"
+msgstr "exercisync не нашел тренировок в ваших профилях"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:38
+msgid "Have you synchronized lately?"
+msgstr "Вы недавно синхронизировались?"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:39
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: .\tapiriik\web\templates\activities-dashboard.html:40
+msgid ""
+"<b>If your account is currently synchronizing</b>, those activities will "
+"appear here once the synchronization completes. All dates shown are in UTC."
+msgstr ""
+"<b>Если ваш аккаунт в данный момент синхронизируется</b>, тренировки "
+"появятся здесь как только синхронизация завершится. Все даты отображаются в "
+"UTC."
+
+#: .\tapiriik\web\templates\auth\disconnect.html:8
+msgid "I'm sure"
+msgstr "Я уверен"
+
+#: .\tapiriik\web\templates\auth\disconnect.html:9
+msgid "Never mind"
+msgstr "В другой раз"
+
+#: .\tapiriik\web\templates\auth\disconnect.html:12
+msgid "(no data will be deleted - just no more synchronization will happen)"
+msgstr "(синхронизация работать не будет, но никакие данные не будут удалены)"
+
+#: .\tapiriik\web\templates\auth\login.html:6
+#: .\tapiriik\web\templates\oauth-failure.html:5
+msgid "There was a problem logging you into"
+msgstr "Проблема с подключением аккаунта"
+
+#: .\tapiriik\web\templates\auth\login.html:8
+msgid "You're logging into"
+msgstr "Аккаунт подключен"
+
+#: .\tapiriik\web\templates\auth\login.html:12
+msgid "Remember these details"
+msgstr "Запомнить данные"
+
+#: .\tapiriik\web\templates\dashboard.html:6
+#, fuzzy
+#| msgid "activities dashboard"
+msgid "dashboard"
+msgstr "панель тренировок"
+
+#: .\tapiriik\web\templates\dashboard.html:6
+msgid "sync your runs, rides & more"
+msgstr "синхронизирует бег, вело и не только"
+
+#: .\tapiriik\web\templates\dashboard.html:11
+msgid "Substituting user"
+msgstr "Подстановка пользователя"
+
+#: .\tapiriik\web\templates\dashboard.html:12
+msgid "Return"
+msgstr "Возврат"
+
+#: .\tapiriik\web\templates\dashboard.html:16
+#, fuzzy
+#| msgid "Some activities could not be synchronized."
+msgid "Connected services will be synchronized"
+msgstr "Некоторые тренировки не могут быть синхронизированы."
+
+#: .\tapiriik\web\templates\dashboard.html:16
+msgid "automatically"
+msgstr "автоматически"
+
+#: .\tapiriik\web\templates\dashboard.html:16
+#, fuzzy
+#| msgid "Synchronize Now"
+msgid "when you click Synchronize now"
+msgstr "когда вы кликните &quot;Синхронизация&quot;"
+
+#: .\tapiriik\web\templates\dashboard.html:18
+msgid "Connect a second service to synchronize your activities to &amp; from"
+msgstr "Подключите второй сервис чтобы синхронизировать тренировки на/с него"
+
+#: .\tapiriik\web\templates\dashboard.html:33
+msgid "Queueing to Synchronize"
+msgstr "В очереди на синхронизацию"
+
+#: .\tapiriik\web\templates\dashboard.html:33
+msgid "Synchronize Now"
+msgstr "Синхронизируется сейчас"
+
+#: .\tapiriik\web\templates\dashboard.html:33
+msgid "Synchronization Settings"
+msgstr "Настройки синхронизации"
+
+#: .\tapiriik\web\templates\dashboard.html:33
+#, python-format
+msgid "Attached info 10%%"
+msgstr ""
+
+#: .\tapiriik\web\templates\dashboard.html:38
+msgid "Some activities could not be synchronized."
+msgstr "Некоторые тренировки не могут быть синхронизированы."
+
+#: .\tapiriik\web\templates\dashboard.html:61
+msgid "You can synchronize more services by connecting them below"
+msgstr "Вы можете синхронизироваться с другими сервисами ниже, просто подключите их"
+
+#: .\tapiriik\web\templates\dashboard.html:67
+msgid ""
+"exercisync synchronizes your activities between Aerobia, Garmin Connect, "
+"Polar Flow, PolarPersonalTrainer, Strava, RideWithGPS, Dropbox, Smashrun and "
+"BeginnerTriathlete<br/>\t(your heart rate, cadence, power, and temperature "
+"data syncs too)"
+msgstr ""
+"exercisync синхронизирует ваши тренировки между Аэробия, Garmin Connect, "
+"Polar Flow, PolarPersonalTrainer, Strava, RideWithGPS, Dropbox, Smashrun и "
+"BeginnerTriathlete<br/>\t(данные пульса, каденса, мощности и температуры "
+"тоже будут синхронизированы)"
+
+#: .\tapiriik\web\templates\dashboard.html:73
+msgid "Did not find your service?"
+msgstr "Не нашли свой сервис?"
+
+#: .\tapiriik\web\templates\dashboard.html:73
+msgid "Try here"
+msgstr "Попробуйте здесь"
+
+#: .\tapiriik\web\templates\dashboard.html:74
+msgid ""
+"Your email, password, and fitness data are kept safe - full details on the"
+msgstr "Ваш email, пароль и данные тренировок в безопасности - подробнее на"
+
+#: .\tapiriik\web\templates\dashboard.html:74
+#: .\tapiriik\web\templates\static\faq.html:80
+msgid "privacy page"
+msgstr "странице приватности"
+
+#: .\tapiriik\web\templates\donation.html:3
+#: .\tapiriik\web\templates\donation.html:18
+msgid "Support the project"
+msgstr "Поддержать проект"
+
+#: .\tapiriik\web\templates\donation.html:6
+msgid "Do you like the service and you want it to get even better?"
+msgstr "Вам нравится сервис и вы хотите чтобы он становился еще лучше?"
+
+#: .\tapiriik\web\templates\donation.html:7
+msgid ""
+"Exercisync is free and open service, but development, support users, server "
+"maintenance - all this requires my efforts. Thank you for your contribution "
+"to the development of the service!"
+msgstr ""
+"Exercisync бесплатный и открытый сервис, но разработка, поддержка "
+"пользователей, обслуживание сервера - все это требует моих усилий. Спасибо "
+"за вклад в развитие сервиса!"
+
+#: .\tapiriik\web\templates\donation.html:15
+msgid "Yandex.Money"
+msgstr "Яндекс.Деньгами"
+
+#: .\tapiriik\web\templates\donation.html:16
+msgid "By bank card"
+msgstr "Банковской картой"
+
+#: .\tapiriik\web\templates\donation.html:17
+msgid "From mobile balance"
+msgstr "С баланса мобильного"
+
+#: .\tapiriik\web\templates\email\payment_confirm.html:4
+msgid "You're good to go"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_confirm.html:5
+msgid ""
+"Your payment has been processed and your tapiriik account is now set up for "
+"automatic synchronization. Of course, you can still visit "
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_confirm.html:5
+msgid "at any time to trigger an immediate synchronization."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_confirm.html:8
+msgid ""
+"Your payment has been processed and your tapiriik account is now set up for "
+"automatic synchronization."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_confirm.html:10
+msgid ""
+"Of course, you can still visit {{ url|safe }} at any time to trigger an "
+"immediate synchronization."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_reclaim.html:4
+msgid "Click here to reclaim your payment"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_reclaim.html:5
+msgid ""
+"Your payment will be reclaimed &amp; associated with the services you are "
+"currently connected to, and any you connect in the future."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_reclaim.html:8
+msgid "Use the following link to to reclaim your payment"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_reclaim.html:12
+msgid ""
+"Your payment will be reclaimed & transferred to the services you are "
+"currently connected to, and any you connect in the future."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:4
+#: .\tapiriik\web\templates\email\payment_renew.html:16
+msgid "It's been a good"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:4
+#: .\tapiriik\web\templates\email\payment_renew.html:16
+msgid "days"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:5
+#: .\tapiriik\web\templates\email\payment_renew.html:18
+msgid "In the past"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:5
+#: .\tapiriik\web\templates\email\payment_renew.html:18
+msgid "or so, tapiriik has kept your"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:5
+msgid "in sync, automatically transferring"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:5
+#: .\tapiriik\web\templates\email\payment_renew.html:18
+msgid "over"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:5
+msgid "km of activities"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:5
+#: .\tapiriik\web\templates\email\payment_renew.html:18
+msgid "your fitness activities night and day"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:7
+msgid "Want to continue automatic synchronization?"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:9
+msgid "If you want to keep automatic synchronization for another year, visit "
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:9
+msgid "connect to one of your accounts, and click the "
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:11
+msgid "Don't worry - you won't automatically be billed."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:12
+msgid ""
+"(and if you were dissatisfied with your experience, please reply to this "
+"email to let me know why!)"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:18
+msgid "in sync, automatically monitoring and transferring"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:18
+msgid "km of your activities"
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:20
+msgid ""
+"If you want to keep automatic synchronization for another year, visit "
+"https://tapiriik.com then connect to one of your accounts, and click the "
+msgstr ""
+
+#: .\tapiriik\web\templates\email\payment_renew.html:22
+msgid ""
+"Don't worry - you won't automatically be billed. If you were dissatisfied "
+"with your experience, please reply to this email to let me know why!)"
+msgstr ""
+
+#: .\tapiriik\web\templates\oauth-failure.html:7
+msgid ""
+"Try logging in again - it might just be a temporary problem connecting to"
+msgstr ""
+
+#: .\tapiriik\web\templates\oauth-failure.html:7
+msgid ""
+"If that doesn't help, try connecting this account using a different browser "
+"or device."
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\claim.html:5
+msgid "Claim your payment"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\claim.html:9
+msgid "There was a problem reclaiming your payment - please contact me"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\claim.html:11
+msgid ""
+"Your payment will be reassociated with the accounts you a currently "
+"connected to"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\claim.html:12
+msgid "Your PayPal Email Address"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\claim_return_fail.html:5
+msgid "Invalid payment claim code"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\claim_return_fail.html:6
+msgid "Please contact me if you're confused."
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\confirmed.html:5
+msgid "Thanks"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\confirmed.html:6
+msgid ""
+"Your exercisync account is now set up for automatic synchronization. You can "
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\confirmed.html:6
+msgid "head back to the dashboard"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\confirmed.html:6
+msgid "or close this window"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\return.html:6
+msgid "Please hold"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\return.html:7
+msgid "we're waiting for PayPal"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\return.html:8
+msgid "If you made an eCheque payment"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\return.html:8
+msgid "your account will be credited once the payment clears (so you can"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\return.html:8
+msgid "return to the dashboard"
+msgstr ""
+
+#: .\tapiriik\web\templates\payments\return.html:8
+msgid "right away"
+msgstr ""
+
+#: .\tapiriik\web\templates\privacy.html:6
+msgid "exercisync stores..."
+msgstr "exercisync хранит..."
+
+#: .\tapiriik\web\templates\privacy.html:10
+msgid "Your <b>email</b>"
+msgstr "<b>Email</b>"
+
+#: .\tapiriik\web\templates\privacy.html:11
+msgid "Your <b>password</b>"
+msgstr "Пароль"
+
+#: .\tapiriik\web\templates\privacy.html:12
+msgid "Access <b>tokens</b>"
+msgstr "<b>Токены</b> доступа"
+
+#: .\tapiriik\web\templates\privacy.html:13
+msgid "Activity <b>metadata</b>"
+msgstr "<b>Метаданные</b> тренировок"
+
+#: .\tapiriik\web\templates\privacy.html:31
+msgid ""
+"..until you disconnect your account or they are no longer needed, whichever "
+"is sooner"
+msgstr "..до тех пор пока они будут нужны или вы не отключите свой аккаунт"
+
+#: .\tapiriik\web\templates\privacy.html:35
+msgid "<span>What are</span>Access tokens?"
+msgstr "<span>Что такое</span>Токены доступа?"
+
+#: .\tapiriik\web\templates\privacy.html:36
+msgid ""
+"Access tokens allow exercisync to <b>perform actions on your behalf</b>. By "
+"using access tokens, exercisync never needs to store your username or "
+"password. In order to obtain an access token, exercisync may need to ask for "
+"your credentials - which are erased immediately after being exchanged for an "
+"access token."
+msgstr ""
+"Токены доступа позволяют exercisync-у <b>действовать от вашего имени</b>. "
+"Используя токен, exercisync-у не нужно хранить ваши логин и пароль от "
+"сторонних сервисов. Чтобы получить токен, exercisync может запросить ваши "
+"учетные данные, которые будут удалены сразу же, как только токен будет "
+"получен."
+
+#: .\tapiriik\web\templates\privacy.html:40
+msgid "<span>What is</span>Activity metadata?"
+msgstr "<span>Что такое</span>Метаданные тренировок?"
+
+#: .\tapiriik\web\templates\privacy.html:41
+msgid ""
+"Activity Medatada are the basic details of any activity: <b>start time, time "
+"zone, duration, distance, and type</b>. exercisync needs to store this "
+"information to determine which activities should be synchronized to each of "
+"your accounts."
+msgstr ""
+"Метаданные тренировки - это основные её параметры: <b>дата начала, часовой "
+"пояс, длительность, дистанция и вид спорта</b>. exercisync должен хранить "
+"эту информацию чтобы определить какие тренировки на какие сервисы нужно "
+"синхронизировать."
+
+#: .\tapiriik\web\templates\privacy.html:45
+msgid "<span>What constitutes</span>Activity data?"
+msgstr "<span>Что включают в себя</span>данные тренировки?"
+
+#: .\tapiriik\web\templates\privacy.html:46
+msgid ""
+"Activity data is the complete record of an activity: <b>the GPS track, "
+"sensor data, and all metadata</b>. To improve synchronization performance, "
+"exercisync temporarily stores (caches) this data from your Dropbox account."
+msgstr ""
+"Данные тренировки включают в себя: <b>GPS трэк, данные с датчиков а так же "
+"все метаданные</b>. Для повышения производительности exercisync временно "
+"сохраняет эти данные из вашего Dropbox аккаунта."
+
+#: .\tapiriik\web\templates\privacy.html:52
+msgid ""
+" I've done a good deal to keep your password safe, but there has to be a way "
+"for exercisync to use it to sync your account. Therefore, anyone with enough "
+"access and resources to the exercisync database and servers could access it, "
+"too."
+msgstr ""
+" Ваши пароли достаточно хорошо защищены, однако так как exercisync имеет к "
+"ним доступ чтобы синхронизация была возможна, каждый, кому удастся получить "
+"доступ к серверам, сможет получить доступ и к паролям. "
+
+#: .\tapiriik\web\templates\privacy.html:54
+msgid ""
+" The email address you used to pay is stored so that you can transfer or "
+"recover your payment."
+msgstr ""
+" Адрес электронной почты, использованный для оплаты хранится, чтобы вы могли "
+"восстановить оплату."
+
+#: .\tapiriik\web\templates\recent-sync-activity-block.html:6
+msgid "Recently Synchronized Activities"
+msgstr "Только что загруженные тренировки"
+
+#: .\tapiriik\web\templates\recent-sync-activity-block.html:19
+msgid "All Activities"
+msgstr "Все тренировки"
+
+#: .\tapiriik\web\templates\service-button.html:12
+msgid "Sync with"
+msgstr "Синхронизировать"
+
+#: .\tapiriik\web\templates\service-button.html:27
+msgid "Paused"
+msgstr "На паузе"
+
+#: .\tapiriik\web\templates\service-button.html:29
+msgid "Connected"
+msgstr "Подключено"
+
+#: .\tapiriik\web\templates\service-button.html:35
+msgid "Reauthorize"
+msgstr ""
+
+#: .\tapiriik\web\templates\service-button.html:39
+msgid "Reconfigure"
+msgstr ""
+
+#: .\tapiriik\web\templates\service-button.html:43
+#, fuzzy
+#| msgid "Connect"
+msgid "Disconnect"
+msgstr "Подключить"
+
+#: .\tapiriik\web\templates\service-button.html:48
+msgid "Connect"
+msgstr "Подключить"
+
+#: .\tapiriik\web\templates\settings-block.html:10
+msgid "Check for new activities"
+msgstr "Проверить наличие новых тренировок"
+
+#: .\tapiriik\web\templates\settings-block.html:16
+msgid "Upload activities"
+msgstr "Загружать тренировки"
+
+#: .\tapiriik\web\templates\settings-block.html:21
+msgid "after they finish, but skip them if they happened"
+msgstr "сразу же после их завершения, но игнорировать тренировки"
+
+#: .\tapiriik\web\templates\settings-block.html:25
+#: .\tapiriik\web\templates\settings.html:49
+msgid "Save"
+msgstr "Сохранить"
+
+#: .\tapiriik\web\templates\settings.html:10
+msgid "Advanced settings"
+msgstr "Продвинутые настройки"
+
+#: .\tapiriik\web\templates\site.html:62
+msgid "when kudos on strava is not enough"
+msgstr "Когда недостаточно лайков на strava"
+
+#: .\tapiriik\web\templates\site.html:71
+msgid "FAQ"
+msgstr "ЧАВО"
+
+#: .\tapiriik\web\templates\site.html:71
+msgid "Privacy"
+msgstr "Приватность"
+
+#: .\tapiriik\web\templates\site.html:71
+#: .\tapiriik\web\templates\static\credits.html:5
+msgid "Credits"
+msgstr "Благодарности"
+
+#: .\tapiriik\web\templates\site.html:71
+msgid "Log out"
+msgstr "Выйти"
+
+#: .\tapiriik\web\templates\site.html:71
+msgid "All trademarks displayed are property of their respective owners"
+msgstr "Все товарные знаки являются собственностью их владельцев"
+
+#: .\tapiriik\web\templates\site.html:72
+msgid "is an"
+msgstr "это"
+
+#: .\tapiriik\web\templates\site.html:72
+msgid "open source project"
+msgstr "открытый проект,"
+
+#: .\tapiriik\web\templates\site.html:72
+msgid "by"
+msgstr "автор"
+
+#: .\tapiriik\web\templates\site.html:72
+msgid "Anton Ashmarin"
+msgstr "Антон Ашмарин"
+
+#: .\tapiriik\web\templates\static\contact.html:7
+msgid "For system status updates"
+msgstr "Для системных обновлений"
+
+#: .\tapiriik\web\templates\static\contact.html:8
+msgid "exercisync group on aerobia.ru"
+msgstr "группа exercisync на aerobia.ru"
+
+#: .\tapiriik\web\templates\static\contact.html:11
+msgid "For help with your account"
+msgstr "Если вам нужна помощь"
+
+#: .\tapiriik\web\templates\static\contact.html:12
+msgid "If you are having issues with your account"
+msgstr "Если у вас проблемы с аккаунтом,"
+
+#: .\tapiriik\web\templates\static\contact.html:12
+msgid "please check"
+msgstr "пожалуйста, проверьте"
+
+#: .\tapiriik\web\templates\static\contact.html:12
+msgid "the activity dashboard"
+msgstr "панель тренировок"
+
+#: .\tapiriik\web\templates\static\contact.html:12
+msgid "it'll do its best to tell you what went wrong"
+msgstr "она должна помочь вам понять что пошло не так"
+
+#: .\tapiriik\web\templates\static\contact.html:14
+msgid ""
+"If you're dissatisfied with the service and want a refund, make sure to "
+"mention that in the subject line so I can respond quickly."
+msgstr ""
+"Если вы разочарованы в сервисе и хотите вернуть деньги - упомяните это в "
+"теме письма чтобы я смог быстро ответить."
+
+#: .\tapiriik\web\templates\static\contact.html:15
+msgid ""
+"If you are making an enquiry regarding the European Union's General Data "
+"Protection Regulation, please mention "
+msgstr ""
+"Если вы делаете запрос в отношении регулирования защиты общих данных "
+"Европейского Союза, пожалуйста, укажите "
+
+#: .\tapiriik\web\templates\static\credits.html:7
+msgid "Exercisync is based on the"
+msgstr "Exercisync основан на"
+
+#: .\tapiriik\web\templates\static\credits.html:7
+msgid "open source project by"
+msgstr "открытый проект авторства"
+
+#: .\tapiriik\web\templates\static\credits.html:8
+msgid "Charles Anssens"
+msgstr ""
+
+#: .\tapiriik\web\templates\static\credits.html:8
+msgid ""
+"for localization/internationalization and integration with DecathlonCoach"
+msgstr "за локализацию/интернационализацию и поддержку DecathlonCoach"
+
+#: .\tapiriik\web\templates\static\credits.html:9
+msgid "Timur Bilalov"
+msgstr "Тимур Билалов"
+
+#: .\tapiriik\web\templates\static\credits.html:9
+msgid "for frontend contributions"
+msgstr "за вклад в пользовательский интерфейс"
+
+#: .\tapiriik\web\templates\static\credits.html:10
+msgid ""
+"Aerobia, Polar, Strava et al.</b> for creating and supporting the APIs that "
+"make this site possible"
+msgstr ""
+"Аэробия, Polar, Strava и других</b> за создание и поддержку своих API, "
+"которые используются этим сайтом"
+
+#: .\tapiriik\web\templates\static\credits.html:11
+msgid "Some icons made by"
+msgstr "Некоторые иконки сделаны"
+
+#: .\tapiriik\web\templates\static\credits.html:11
+msgid "from"
+msgstr "из"
+
+#: .\tapiriik\web\templates\static\credits.html:11
+msgid "is licensed by"
+msgstr "лицензированы"
+
+#: .\tapiriik\web\templates\static\credits.html:12
+msgid "and finally, <b>all the beta testers</b>. You know who you are."
+msgstr "и в конце концов, <b>всех бета-тестеров</b>. Вы себя знаете."
+
+#: .\tapiriik\web\templates\static\faq.html:6
+msgid "Questions: Answered"
+msgstr "Вопросы - ответы"
+
+#: .\tapiriik\web\templates\static\faq.html:9
+msgid "What do I have to do to use exercisync?"
+msgstr "Что нужно чтобы использовать exercisync?"
+
+#: .\tapiriik\web\templates\static\faq.html:10
+msgid ""
+"Just connect to all the services you would like to sync between, click &quot;"
+"Synchronize now,&quot; then forget ever reading this sentence."
+msgstr ""
+"Просто подключите все сервисы, которые вы хотите синхронизировать, нажмите "
+"&quot;Синхронизация,&quot; и можете забыть про этот сайт. :)"
+
+#: .\tapiriik\web\templates\static\faq.html:14
+msgid "Do I need to re-connect my accounts every time?"
+msgstr "Нужно ли переподключать сервисы каждый раз?"
+
+#: .\tapiriik\web\templates\static\faq.html:15
+msgid ""
+"<strong>No!</strong> Just <strong>connect to any one of the services you "
+"have already connected</strong>, and you will be signed back into exercisync "
+"and ready to start another synchronization."
+msgstr ""
+"<strong>Нет!</strong> Просто <strong>подключите какой-либо из своих сервисов "
+"</strong>, чтобы полностью загрузить свой профиль на exercisync и можно "
+"запускать новую синхронизацию."
+
+#: .\tapiriik\web\templates\static\faq.html:19
+msgid "Do I need to visit exercisync.com to sync activities?"
+msgstr "Нужно ли заходить на exercisync.com чтобы синхронизировать тренировки?"
+
+#: .\tapiriik\web\templates\static\faq.html:20
+msgid ""
+"<b>No. Synchronization is fully automatic.</b> You can also manually trigger "
+"a synchronization any time you want."
+msgstr ""
+"<b>Нет. Синхронизация полностью автоматическая.</b> Однако, если хотите, "
+"можно запускать синхронизацию вручную в любой момент."
+
+#: .\tapiriik\web\templates\static\faq.html:24
+msgid "Which activities get synchronized?"
+msgstr "Какие тренировки синхронизируются?"
+
+#: .\tapiriik\web\templates\static\faq.html:25
+msgid ""
+"<b>All supported activities in your account are synchronized</b>, not just "
+"new ones. Manually entered activities are supported, but are not currently "
+"being synchronized <i>to</i> TrainingPeaks (still some bugs to work out "
+"there)."
+msgstr ""
+"<b>Все поддерживаемые виды тренировок будут синхронизированы</b>, не только "
+"вновь добавленные. Созданные вручную тренировки тоже поддерживаются, но пока "
+"не синхронизируются <i>на</i> TrainingPeaks (нужно разобраться с ошибками)."
+
+#: .\tapiriik\web\templates\static\faq.html:29
+msgid "What's the difference from"
+msgstr "В чем отличие от"
+
+#: .\tapiriik\web\templates\static\faq.html:30
+msgid ""
+"It is pretty the same site but with free synchronization and some sport "
+"trackers tapiriik doesn't support."
+msgstr ""
+"Это почти то же самое, но с бесплатной автоматической синхронизацией и "
+"некоторыми сервисами/функциями, не поддерживаемыми на tapiriik.com."
+
+#: .\tapiriik\web\templates\static\faq.html:34
+msgid "Will exercisync create duplicate activities?"
+msgstr "Создает ли exercisync дубликаты тренировок?"
+
+#: .\tapiriik\web\templates\static\faq.html:35
+msgid ""
+"Nope - <b>even if you tracked the same activity on multiple devices, or with "
+"multiple apps,</b> exercisync will see that and <b>won't create any "
+"duplicate activities</b>."
+msgstr ""
+"Обычно нет - <b>Даже если вы записываете тренировку несколькими устройствами "
+"или приложениями, </b>exercisync это поймет <b>и не создаст дубликатов "
+"тренировок</b>."
+
+#: .\tapiriik\web\templates\static\faq.html:39
+msgid "What about activities I've marked as private?"
+msgstr "Что на счет приватных тренировок?"
+
+#: .\tapiriik\web\templates\static\faq.html:40
+msgid ""
+"By default, <b>exercisync will <u>not</u> sync private activities</b>. If "
+"you wish, you can opt to have private activities synchronized. <b>exercisync "
+"tries to keep private activities private</b>, but <b>not all services "
+"support private activities,</b> so you should be cognizant of your privacy "
+"settings across all of your accounts."
+msgstr ""
+"По умолчанию, <b>exercisync <u>не</u> синхронизирует приватные тренировки</"
+"b>. Если хотите, можете изменить это галочкой в настройках. <b>exercisync "
+"постарается сохранить приватность тренировок</b>, но <b>не все сервисы "
+"поддерживают приватность,</b> так что вы должны быть в курсе своих настроек "
+"приватности на других сервисах."
+
+#: .\tapiriik\web\templates\static\faq.html:44
+msgid "What data gets synchronized?"
+msgstr "Какие данные синхронизируются?"
+
+#: .\tapiriik\web\templates\static\faq.html:45
+msgid ""
+"As much as possible: in addition to your path, exercisync will also sync "
+"<b>distance, speed, heart rate, cadence, power, calories burned and even "
+"temperature</b> between all services which support them."
+msgstr ""
+"Все возможные: в дополнение к треку, exercisync так же синхронизирует "
+"<b>дистанцию, скорость, ЧСС, каденс, мощность, калории и даже температуру</"
+"b> между всеми сервисами, которые это поддерживают."
+
+#: .\tapiriik\web\templates\static\faq.html:49
+msgid "The activity statistics changed after a sync!"
+msgstr "Статистика тренировки изменилась после синхронизации!"
+
+#: .\tapiriik\web\templates\static\faq.html:50
+msgid ""
+"Discrepancies in activity statistics, like elevation gained/lost or calories "
+"burned, appear when <strong>services use different algorithms to calculate "
+"the same values</strong>. <strong>exercisync does not calculate these</"
+"strong> during synchronization."
+msgstr ""
+"Расхождения в статистике происходят когда <strong>сервисы используют разные "
+"алгоритмы для расчета тех или иных значений</strong>. <strong>exercisync не "
+"вычисляет ничего</strong> в процессе синхронизации."
+
+#: .\tapiriik\web\templates\static\faq.html:54
+msgid "Can I view which activities were synchronized?"
+msgstr "Могу ли  посмотреть какие тренировки были синхронизированы?"
+
+#: .\tapiriik\web\templates\static\faq.html:55
+msgid "When logged in, you can <b>visit the "
+msgstr "Когда вы вошли в систему, можете <b>зайти на "
+
+#: .\tapiriik\web\templates\static\faq.html:55
+msgid "activities dashboard"
+msgstr "панель тренировок"
+
+#: .\tapiriik\web\templates\static\faq.html:55
+msgid "to see which activities were (or were not) synchronized, and to where."
+msgstr ""
+"чтобы посмотреть какие тренировки были (или не были) синхронизированы, и в "
+"какие сервисы."
+
+#: .\tapiriik\web\templates\static\faq.html:59
+msgid "Can I sync in only one direction?"
+msgstr "Могу ли я синхронизироваться только в одном направлении?"
+
+#: .\tapiriik\web\templates\static\faq.html:60
+msgid ""
+"Yes: <b>before triggering a sync</b>, open up the options for the service in "
+"question and tweak as desired. These preferences are applied to all "
+"activities - even after they've been synchronized to other services."
+msgstr ""
+"Да: <b>перед тем как запустить первую синхронизацию</b>, откройте опции "
+"сервиса-источника и отметьте галочками те сервисы, на которые вы хотите "
+"загружать тренировки."
+
+#: .\tapiriik\web\templates\static\faq.html:64
+msgid "What are \"untagged activities\" and why do I care?"
+msgstr "Что такое \"тренировки без типа\"?"
+
+#: .\tapiriik\web\templates\static\faq.html:65
+msgid ""
+"GPX and TCX files in your Dropbox don't include information about the type "
+"of activity they contain"
+msgstr "GPX и TCX файлы в Dropbox не содержат информации о виде спорта"
+
+#: .\tapiriik\web\templates\static\faq.html:65
+msgid "You need to include the"
+msgstr "Вам нужно указать"
+
+#: .\tapiriik\web\templates\static\faq.html:65
+msgid "type of the activity"
+msgstr "вид спорта"
+
+#: .\tapiriik\web\templates\static\faq.html:65
+msgid "in the file name, or place the file in an"
+msgstr "в имени файла или положить файл в"
+
+#: .\tapiriik\web\templates\static\faq.html:65
+msgid "appropriately named folder"
+msgstr "папку с соответствующим именем"
+
+#: .\tapiriik\web\templates\static\faq.html:69
+msgid "Who is \"exercisync\" on Garmin Connect?"
+msgstr "Кто такой \"exercisync\" на Garmin Connect?"
+
+#: .\tapiriik\web\templates\static\faq.html:70
+msgid ""
+"To enable efficient synchronization, <b>exercisync adds a special user</b> "
+"to your Garmin Connect connections. You should <b>never accept a separate "
+"connection request</b> from a user like this; the process is fully automatic."
+msgstr ""
+"Для более эффективной синхронизации, <b>exercisync использует специального "
+"пользователя</b> для подключения к вашему Garmin Connect. <b>Ни в коем "
+"случае не подтверждайте запрос на подключения</b> от этого пользователя "
+"самостоятельно; процесс автоматический."
+
+#: .\tapiriik\web\templates\static\faq.html:70
+msgid "Read more"
+msgstr "Подробнее"
+
+#: .\tapiriik\web\templates\static\faq.html:74
+msgid "Does exercisync ever modify or delete my activities?"
+msgstr "Удаляет/изменяет ли exercisync мои тренировки?"
+
+#: .\tapiriik\web\templates\static\faq.html:75
+msgid "<b>No.</b> Simple as that."
+msgstr "<b>Нет.</b> Просто нет."
+
+#: .\tapiriik\web\templates\static\faq.html:79
+msgid "What data is stored on your servers?"
+msgstr "Какие данные хранятся на ваших серверах?"
+
+#: .\tapiriik\web\templates\static\faq.html:80
+msgid "As little as is required. Check out the"
+msgstr "Только самое необходимое. Подробнее:"
+
+#: .\tapiriik\web\templates\static\faq.html:80
+msgid "for more."
+msgstr " "
+
+#: .\tapiriik\web\templates\static\faq.html:84
+msgid "How do I connect more services?"
+msgstr "Как подключить больше сервисов?"
+
+#: .\tapiriik\web\templates\static\faq.html:85
+msgid ""
+"Just sign into any one of the services you already connected, then sign into "
+"the new service (or the other way around, it doesn't matter). The new "
+"service will be synchronized with all the others."
+msgstr ""
+"Просто зайдите сначала в один из сервисов, который у вас уже подключен к "
+"exercisync, затем зайдите в новые сервисы (или наоборот, не важно). Вновь "
+"подключенные сервисы будут синхронизированы со всеми остальными."
+
+#: .\tapiriik\web\templates\static\faq.html:89
+msgid "Will exercisync support <i>Activity Tracking Site X</i>?"
+msgstr "Будет ли поддержка <i>спорт-трекера N</i>?"
+
+#: .\tapiriik\web\templates\static\faq.html:90
+msgid ""
+"Possibly. I've had very little time to add additional services while at the "
+"same time maintaining those already available."
+msgstr ""
+"Вполне возможно. Протсо напишите о своем желании в группе или на github."
+
+#: .\tapiriik\web\templates\static\faq.html:94
+msgid "Can exercisync and CopyMySports be used together?"
+msgstr "Можно ли использовать вместе exercisync и CopyMySports?"
+
+#: .\tapiriik\web\templates\static\faq.html:95
+msgid ""
+"<b>I wouldn't recommend it</b> - CopyMySports will often create duplicates "
+"of activities exercisync has already synchronized."
+msgstr ""
+"<b>Я бы не рекомендовал</b> - CopyMySports часто создает дубликаты "
+"тренировок, которые exercisync уже синхронизировал."
+
+#: .\tapiriik\web\templates\supported-activities.html:16
+msgid "This list doesn't matter"
+msgstr "Этот список не имеет значения"
+
+#: .\tapiriik\web\templates\supported-activities.html:17
+msgid ""
+"Do not despair if the activities you want to sync are not on this list</b>, "
+"exercisync can still synchronize them. You'll just have to change them to "
+"the appropriate activity type once they've arrived at their final "
+"destination(s). <b>HR, power, cadence, temperature, and caloric data will "
+"always be synchronized</b> when the destination supports it, no matter what "
+"type of activity the data is attached to."
+msgstr ""
+"Не отчаивайтесь, если вашего вида спорта нет в этом списке</b>, exercisync "
+"все еще может синхронизировать такие тренировки. Вам нужно просто изменить "
+"вид спорта вручную, когда тренировка будет загружена на ваши сервис(ы) "
+"<b>ЧСС, каденс, мощность, температура, калории и все остальные данные всегда "
+"будут синхронизированы</b> если поддерживаются конечным сервисом в "
+"независимости от вида спорта."

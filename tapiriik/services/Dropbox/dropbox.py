@@ -42,6 +42,10 @@ class DropboxService(ServiceBase):
         ActivityType.Rowing: "row",
         ActivityType.Elliptical: "elliptical",
         ActivityType.RollerSkiing: "rollerskiing",
+        ActivityType.StrengthTraining: "strength( ?training)?",
+        ActivityType.Gym: "(gym|workout)",
+        ActivityType.Climbing: "climb(ing)?",
+        ActivityType.StandUpPaddling: "(sup|stand( |-)/up ?paddl(e|ing))",
         ActivityType.Other: "(other|unknown)"
     }
     ConfigurationDefaults = {"SyncRoot": "/", "UploadUntagged": False, "Format":"tcx", "Filename":"%Y-%m-%d_%H-%M-%S_#NAME_#TYPE"}
@@ -114,9 +118,11 @@ class DropboxService(ServiceBase):
             cachedb.dropbox_cache.update({"ExternalID": svcRec.ExternalID}, {"$unset": {"Structure": None}})
 
     def _raiseDbException(self, e):
-        if type(e) is dropbox.exceptions.AuthError:
+        if isinstance(e, dropbox.exceptions.AuthError):
             raise APIException("Authorization error - %s" % e, block=True, user_exception=UserException(UserExceptionType.Authorization, intervention_required=True))
-        if hasattr(e, "error") and getattr(e.error, "insufficient_space", None):
+        if isinstance(e, dropbox.exceptions.ApiError) and \
+           e.error.is_path() and \
+           e.error.get_path().reason.is_insufficient_space():
             raise APIException("Dropbox quota error", block=True, user_exception=UserException(UserExceptionType.AccountFull, intervention_required=True))
         raise APIException("API failure - %s" % e)
 
@@ -283,7 +289,8 @@ class DropboxService(ServiceBase):
 
     def _clean_activity_name(self, name):
         # https://www.dropbox.com/help/145/en
-        return re.sub("[><:\"|?*]", "", re.sub("[/\\\]", "-", name))
+        # Nothing outside BMP is allowed, either, apparently.
+        return re.sub("[@><:\"|?*]|[^\U00000000-\U0000d7ff\U0000e000-\U0000ffff]", "", re.sub("[/\\\]", "-", name))
 
     def _format_file_name(self, format, activity):
         name_pattern = re.compile("#NAME", re.IGNORECASE)
