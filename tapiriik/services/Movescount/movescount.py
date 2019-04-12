@@ -17,8 +17,7 @@ class MovescountService(ServiceBase):
     AuthenticationType = ServiceAuthenticationType.OAuth
     AuthenticationNoFrame = True # form not fit in the small frame
 
-    _api_endpoint = "https://partner-rest.movescount.com/"
-    _ui_url = "https://partner-ui.movescount.com/"
+    _api_endpoint = "https://cloudapi-oauth.suunto.com/"
 
     def _with_auth(self, serviceRecord, data={}):
         data.update({"appkey": MOVESCOUNT_APP_KEY})
@@ -27,9 +26,10 @@ class MovescountService(ServiceBase):
         return data
 
     def WebInit(self):
-        params = {'client_id': MOVESCOUNT_APP_KEY,
+        params = {'response_type': 'code',
+                  'client_id': MOVESCOUNT_APP_KEY,
                   'redirect_uri': WEB_ROOT + reverse("oauth_return", kwargs={"service": "movescount"})}
-        self.UserAuthorizationURL = self._ui_url +"auth?" + urlencode(params)
+        self.UserAuthorizationURL = self._api_endpoint + "oauth/authorize?" + urlencode(params)
 
     def RetrieveAuthorizationToken(self, req, level):
         error = req.GET.get("error", False)
