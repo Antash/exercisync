@@ -54,7 +54,8 @@ class AerobiaService(ServiceBase):
         ActivityType.Climbing : "Rock climbing",
         ActivityType.RollerSkiing : "Roller skiing",
         ActivityType.StrengthTraining : "Ofp",
-        ActivityType.Other : "Sport"
+        ActivityType.Other : "Sport",
+        ActivityType.Report : "Report"
     }
 
     # aerobia -> common
@@ -238,6 +239,8 @@ class AerobiaService(ServiceBase):
         activities = []
         exclusions = []
 
+        loadMediaContent = serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+
         fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, page)
 
         total_pages = None
@@ -301,6 +304,9 @@ class AerobiaService(ServiceBase):
     def DownloadActivity(self, serviceRecord, activity):
         session = self._get_session(serviceRecord)
         activity_id = activity.ServiceData["ActivityID"]
+
+        if activity.Type == ActivityType.Report:
+            pass
 
         tcx_data = session.get("{}export/workouts/{}/tcx".format(self._urlRoot, activity_id), data=self._with_auth(serviceRecord))
         activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)

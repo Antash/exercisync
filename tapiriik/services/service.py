@@ -47,7 +47,8 @@ class Service:
             Setio,
             Singletracker,
             DecathlonCoach,
-            PolarPersonalTrainer
+            PolarPersonalTrainer,
+            LocalExporter
         ] + PRIVATE_SERVICES
 
     def PreferredDownloadPriorityList():
@@ -76,7 +77,8 @@ class Service:
             Singletracker,
             Aerobia,
             DecathlonCoach,
-            PolarPersonalTrainer
+            PolarPersonalTrainer,
+            LocalExporter
         ] + PRIVATE_SERVICES
 
     def WebInit():

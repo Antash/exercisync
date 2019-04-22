@@ -25,6 +25,7 @@ class ActivityType:  # taken from RK API docs. The text values have no meaning e
     StrengthTraining = "StrengthTraining"
     StandUpPaddling = "StandUpPaddling"
     Other = "Other"
+    Report = "Report" # Text reports and other notes not contain activity data
 
     def List():
         # I'd argue that this is marginally better than the 200+ char hardcoded list it's replacing
@@ -74,6 +75,8 @@ class Activity:
         self.GPS = gps
         self.PrerenderedFormats = {}
         self.Device = device
+        self.NotesExt = notes
+        self.PhotoUrls = []
 
     def CalculateUID(self):
         if not self.StartTime:
