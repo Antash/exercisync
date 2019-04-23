@@ -12,9 +12,11 @@ import requests
 import shutil
 import zipfile
 import uuid
+import django
 
 # Make settings work (to send email)
 os.environ["DJANGO_SETTINGS_MODULE"] = "tapiriik.settings"
+django.setup()
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +33,23 @@ class LocalExporterService(ServiceBase):
     SupportedActivities = [
         ActivityType.Running,
         ActivityType.Cycling,
-        ActivityType.Other
+        ActivityType.MountainBiking,
+        ActivityType.Walking,
+        ActivityType.Hiking,
+        ActivityType.DownhillSkiing,
+        ActivityType.CrossCountrySkiing,
+        ActivityType.Snowboarding,
+        ActivityType.Skating,
+        ActivityType.Swimming,
+        ActivityType.Wheelchair,
+        ActivityType.Rowing,
+        ActivityType.Elliptical,
+        ActivityType.Gym,
+        ActivityType.Climbing,
+        ActivityType.RollerSkiing,
+        ActivityType.StrengthTraining,
+        ActivityType.Other,
+        ActivityType.Report
     ]
 
     def _download_image(self, image_url, file_name):
