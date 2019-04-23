@@ -62,13 +62,14 @@ class LocalExporterService(ServiceBase):
                     break
                 handle.write(block)
 
-    def Authorize(self, username, password):
+    def _ensure_user_root_exists(self, serviceRecord):
         if not os.path.exists(USER_DATA_FILES):
             os.mkdir(USER_DATA_FILES)
-        user_folder = os.path.join(USER_DATA_FILES, username)
-        if os.path.exists(user_folder):
-            shutil.rmtree(user_folder, ignore_errors=True)
-        os.mkdir(user_folder)
+        root = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
+        if not os.path.exists(root):
+            os.mkdir(root)
+
+    def Authorize(self, username, password):
         return (username, {}, {"Email" : username, "Password": password})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
@@ -103,8 +104,9 @@ class LocalExporterService(ServiceBase):
         pass
 
     def UploadActivity(self, serviceRecord, activity):
-        tcx_data = None
+        self._ensure_user_root_exists(serviceRecord)
 
+        tcx_data = None
         # Patch tcx with notes
         if not activity.NotesExt and activity.Notes:
             tcx_data = TCXIO.Dump(activity)
@@ -114,8 +116,6 @@ class LocalExporterService(ServiceBase):
             tcx_data = TCXIO.Dump(activity)
 
         name_base = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
-        if not os.path.exists(name_base):
-            os.mkdir(name_base)
 
         day_name_chunk = activity.StartTime.strftime("%Y-%m-%d")
         filename_base = "{}_{}".format(day_name_chunk, activity.Type)
