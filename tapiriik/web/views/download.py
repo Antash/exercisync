@@ -6,7 +6,7 @@ def save_content(req, file_id):
     
     zip_filename = "{}.zip".format(file_id)
 
-    file_path = USER_DATA_FILES + zip_filename
+    file_path = os.path.join(USER_DATA_FILES, zip_filename)
     if os.path.isfile(file_path):
         zip_file = open(file_path, 'rb')
         resp = HttpResponse(zip_file, content_type='application/force-download')
