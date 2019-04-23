@@ -219,6 +219,9 @@ class AerobiaService(ServiceBase):
         record.Authorization.update(auth_datails)
         db.connections.update({"_id": record._id}, {"$set": {"Authorization": auth_datails}})
 
+    def _load_media(self, serviceRecord):
+        return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+
     def _with_auth(self, record, params={}):
         params.update({"authentication_token": record.Authorization["OAuthToken"]})
         return params
@@ -239,7 +242,7 @@ class AerobiaService(ServiceBase):
         activities = []
         exclusions = []
 
-        loadMediaContent = serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+        loadMediaContent = self._load_media(serviceRecord)
 
         fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, page)
 
@@ -314,6 +317,10 @@ class AerobiaService(ServiceBase):
         res = session.get(self._workoutUrlJson.format(id=activity_id), data=self._with_auth(serviceRecord))
         activity_data = res.json()
         activity_ex.Name = activity_data["name"]
+
+        if "photos" in activity_data["post"]:
+            for img_info in activity_data["post"]["photos"]:
+                activity_ex.PhotoUrls.append({"id": img_info["id"], "url": img_info["original"]})
         # Notes comes as html. Hardly any other service will support this so needs to extract text data
         if "body" in activity_data["post"]:
             post_html = activity_data["post"]["body"]
@@ -322,13 +329,18 @@ class AerobiaService(ServiceBase):
             for style in soup("style"):
                 style.decompose()
             activity_ex.Notes = soup.getText()
+            #TODO set max report limit?
+            # all notes with photos considered as reports
+            if len(activity_ex.Notes) > 1000 or len(activity_ex.PhotoUrls):
+                activity_ex.NotesExt = soup.prettify()
 
         # Dirty hack to patch users inventory even if they use aerobia mobile app to record activities
         # Still need to sync with some service though.
-        extra_data = {}
-        self._put_default_inventory(activity, serviceRecord, extra_data)
-        if extra_data:
-            self._patch_activity(serviceRecord, extra_data, activity_id)
+        # TODO should driven by setting
+        #extra_data = {}
+        #self._put_default_inventory(activity, serviceRecord, extra_data)
+        #if extra_data:
+        #    self._patch_activity(serviceRecord, extra_data, activity_id)
 
         return activity_ex
 
