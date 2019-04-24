@@ -156,6 +156,8 @@ class AerobiaService(ServiceBase):
     _workoutUrlJson = _apiRoot + "workouts/{id}.json"
     _workoutUrl = _urlRoot + "workouts/{id}"
     _uploadsUrl = _apiRoot + "uploads.json"
+    _postsUrl = _apiRoot + "my/posts"
+    _postUrlJson = _apiRoot + "posts/{id}.json"
 
     def _get_session(self, record=None, username=None):
         cached = self._sessionCache.Get(record.ExternalID if record else username)
@@ -219,7 +221,7 @@ class AerobiaService(ServiceBase):
         record.Authorization.update(auth_datails)
         db.connections.update({"_id": record._id}, {"$set": {"Authorization": auth_datails}})
 
-    def _load_media(self, serviceRecord):
+    def _should_load_media(self, serviceRecord):
         return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
 
     def _with_auth(self, record, params={}):
@@ -242,9 +244,7 @@ class AerobiaService(ServiceBase):
         activities = []
         exclusions = []
 
-        loadMediaContent = self._load_media(serviceRecord)
-
-        fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, page)
+        fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, self._postsUrl, page)
 
         total_pages = None
         page = 1
@@ -265,11 +265,30 @@ class AerobiaService(ServiceBase):
             if not exhaustive or page > total_pages:
                 break
 
+        loadMediaContent = self._should_load_media(serviceRecord)
+        if loadMediaContent:
+            fetch_posts = lambda page=1: self._get_feed_xml(serviceRecord, self._postsUrl, page)
+            page = 1
+            has_more = True
+            while has_more:
+                feed_xml = self._call(serviceRecord, fetch_diary, page)
+
+                for post_info in feed_xml.findall("posts/r"):
+                    activity = self._create_post(post_info)
+                    activities.append(activity)
+
+                pagination = feed_xml.find("pagination")
+                has_more = pagination.get("more") == "true" if pagination is not None else False
+                page += 1
+
+                if not exhaustive:
+                    break
+
         return activities, exclusions
 
-    def _get_diary_xml(self, serviceRecord, page=1):
+    def _get_diary_xml(self, serviceRecord, endpoint, page=1):
         session = self._get_session(serviceRecord)
-        diary_data = session.get(self._workoutsUrl, params=self._with_auth(serviceRecord, {"page": page}))
+        diary_data = session.get(endpoint, params=self._with_auth(serviceRecord, {"page": page}))
         diary_xml = etree.fromstring(diary_data.text.encode('utf-8'))
 
         info = diary_xml.find("info")
@@ -277,6 +296,27 @@ class AerobiaService(ServiceBase):
             raise APIException(info.get("description"), user_exception=UserException(UserExceptionType.DownloadError))
 
         return diary_xml
+
+    def _create_post(self, data):
+        post = UploadedActivity()
+        post.Type = ActivityType.Report
+        post.Stationary = True
+
+        post_xml = data.find("post")
+
+        post.Name = post_xml.get("title")
+        post.NotesExt = post_xml.get("formatted_body")
+        post.StartTime = pytz.utc.localize(datetime.strptime(post_xml.get("created_at"), "%Y-%m-%dT%H:%M:%SZ"))
+
+        post.ServiceData = {"ActivityID": post_xml.get("id")}
+
+        if int(post_xml.get("photos_count")) > 0:
+            for photo_xml in data.findall("photos/photo"):
+                post.PhotoUrls.append({"id": photo_xml["id"], "url": photo_xml["image_original"]})
+
+        logger.debug("\tPost s/t {}: {}".format(post.StartTime, post.Type))
+        post.CalculateUID()
+        return post
 
     def _create_activity(self, data):
         activity = UploadedActivity()
@@ -308,8 +348,9 @@ class AerobiaService(ServiceBase):
         session = self._get_session(serviceRecord)
         activity_id = activity.ServiceData["ActivityID"]
 
+        # reports already contains all data
         if activity.Type == ActivityType.Report:
-            pass
+            return activity
 
         tcx_data = session.get("{}export/workouts/{}/tcx".format(self._urlRoot, activity_id), data=self._with_auth(serviceRecord))
         activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)

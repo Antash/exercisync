@@ -1,4 +1,4 @@
-# Local export module for
+# Local export module for exercisync
 # (c) 2018 Anton Ashmarin, aashmarin@gmail.com
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.tcx import TCXIO
@@ -81,6 +81,9 @@ class LocalExporterService(ServiceBase):
         pass
 
     def SynchronizationComplete(self, serviceRecord):
+        #TODO ensure all data downloaded before comressing and sending email and cleanup
+        if len(serviceRecord.SynchronizedActivities):
+            pass
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
         zipf_name = os.path.join(USER_DATA_FILES, user_hash)
@@ -108,30 +111,38 @@ class LocalExporterService(ServiceBase):
 
         tcx_data = None
         # Patch tcx with notes
-        if not activity.NotesExt and activity.Notes:
-            tcx_data = TCXIO.Dump(activity)
-        elif "tcx" in activity.PrerenderedFormats:
-            tcx_data = activity.PrerenderedFormats["tcx"]
-        else:
-            tcx_data = TCXIO.Dump(activity)
+        if activity.Type != ActivityType.Report:
+            if not activity.NotesExt and activity.Notes:
+                tcx_data = TCXIO.Dump(activity)
+            elif "tcx" in activity.PrerenderedFormats:
+                tcx_data = activity.PrerenderedFormats["tcx"]
+            else:
+                tcx_data = TCXIO.Dump(activity)
 
         name_base = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
+
+        # store reports in the separate folder
+        if activity.Type == ActivityType.Report:
+            name_base = os.path.join(name_base, "Posts")
 
         day_name_chunk = activity.StartTime.strftime("%Y-%m-%d")
         filename_base = "{}_{}".format(day_name_chunk, activity.Type)
         if activity.Name:
-            filename_base = "{}_{}_{}".format(day_name_chunk, activity.Type, activity.Name)
+            if activity.Type == ActivityType.Report:
+                filename_base = "{}_{}".format(day_name_chunk, activity.Name)
+            else:
+                filename_base = "{}_{}_{}".format(day_name_chunk, activity.Type, activity.Name)
         
         name_base = os.path.join(name_base, filename_base)
-
-        ext = ".tcx"
-        file_exists = 1
-        while os.path.exists(name_base + ext):
-            ext = "_{}.tcx".format(file_exists)
-            file_exists = file_exists + 1
-        tcx_file_name = name_base + ext
         
         if tcx_data:
+            ext = ".tcx"
+            file_exists = 1
+            while os.path.exists(name_base + ext):
+                ext = "_{}.tcx".format(file_exists)
+                file_exists = file_exists + 1
+            tcx_file_name = name_base + ext
+
             with open(tcx_file_name, 'w') as file:
                 file.write(tcx_data)
 
