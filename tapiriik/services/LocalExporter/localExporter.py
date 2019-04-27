@@ -76,7 +76,7 @@ class LocalExporterService(ServiceBase):
         return (username, {}, {"Email" : username, "Password": password})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
-        # Not supported
+        
         return [], []
 
     def DownloadActivity(self, serviceRecord, activity):

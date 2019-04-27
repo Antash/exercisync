@@ -8,8 +8,8 @@ export default class ExportConfig extends React.Component {
         }
     }
 
-    handleCheckedChange(newState) {
-        this.setState({ upload_media_content: newState }, () => {
+    toggleChecked() {
+        this.setState({ upload_media_content: !this.state.upload_media_content }, () => {
             this.props.handleChange(this.state);
         });
     }
@@ -21,7 +21,7 @@ export default class ExportConfig extends React.Component {
                 <input
                     type="checkbox" 
                     defaultChecked={this.state.upload_media_content} 
-                    onChange={(newState) => this.handleCheckedChange(newState)}
+                    onChange={this.toggleChecked.bind(this)}
                 />
             </div>
         )

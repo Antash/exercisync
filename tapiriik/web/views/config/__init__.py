@@ -74,7 +74,7 @@ def aerobia(req):
         'config': {
                 'gearRules': gearRules,
                 'export': {
-                    'upload_media_content': 'true' if upload_media else 'false'
+                    'upload_media_content': 1 if upload_media else 0
                 }
             }
     }
