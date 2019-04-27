@@ -244,7 +244,7 @@ class AerobiaService(ServiceBase):
         activities = []
         exclusions = []
 
-        fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, self._postsUrl, page)
+        fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, self._workoutsUrl, page)
 
         total_pages = None
         page = 1
@@ -271,7 +271,7 @@ class AerobiaService(ServiceBase):
             page = 1
             has_more = True
             while has_more:
-                feed_xml = self._call(serviceRecord, fetch_diary, page)
+                feed_xml = self._call(serviceRecord, fetch_posts, page)
 
                 for post_info in feed_xml.findall("posts/r"):
                     activity = self._create_post(post_info)
