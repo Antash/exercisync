@@ -81,15 +81,18 @@ class LocalExporterService(ServiceBase):
         pass
 
     def SynchronizationComplete(self, serviceRecord):
+        root = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
+        if not os.path.exists(root):
+            return
         #TODO ensure all data downloaded before comressing and sending email and cleanup
         if len(serviceRecord.SynchronizedActivities):
-            pass
+            return
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
         zipf_name = os.path.join(USER_DATA_FILES, user_hash)
         shutil.make_archive(zipf_name, 'zip', user_folder)
         # Not need raw data anymore
-        self.DeleteCachedData(serviceRecord)
+        #self.DeleteCachedData(serviceRecord)
 
         context = {
             "url": "{}/download/{}".format(WEB_ROOT, user_hash)
