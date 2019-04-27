@@ -8,9 +8,8 @@ export default class ExportConfig extends React.Component {
         }
     }
 
-    handleCheckedChange() {
-        var checkedState = !this.state.upload_media_content
-        this.setState({ upload_media_content: checkedState }, () => {
+    handleCheckedChange(newState) {
+        this.setState({ upload_media_content: newState }, () => {
             this.props.handleChange(this.state);
         });
     }
@@ -18,11 +17,11 @@ export default class ExportConfig extends React.Component {
     render() {
         return (
             <div className="ruleRow">
-                Загрузить все данные
+                Загрузить записи из ленты
                 <input
                     type="checkbox" 
                     defaultChecked={this.state.upload_media_content} 
-                    onChange={this.handleCheckedChange.bind(this)}
+                    onChange={(newState) => this.handleCheckedChange(newState)}
                 />
             </div>
         )

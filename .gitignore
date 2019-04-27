@@ -8,3 +8,5 @@ private/
 node_modules/
 webpack-stats.json
 .vscode/
+*.hot-update.js
+*.hot-update.json
