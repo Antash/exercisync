@@ -246,28 +246,28 @@ class AerobiaService(ServiceBase):
 
         fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, self._workoutsUrl, page)
 
-        total_pages = None
-        page = 1
-        while True:
-            diary_xml = self._call(serviceRecord, fetch_diary, page)
+        # total_pages = None
+        # page = 1
+        # while True:
+        #     diary_xml = self._call(serviceRecord, fetch_diary, page)
 
-            for workout_info in diary_xml.findall("workouts/r"):
-                activity = self._create_activity(workout_info)
-                activities.append(activity)
+        #     for workout_info in diary_xml.findall("workouts/r"):
+        #         activity = self._create_activity(workout_info)
+        #         activities.append(activity)
 
-            if total_pages is None:
-                pagination = diary_xml.find("pagination")
-                # New accounts have no data pages initially
-                total_pages_str = pagination.get("total_pages") if pagination is not None else None
-                total_pages = int(total_pages_str) if total_pages_str else 1
-            page += 1
+        #     if total_pages is None:
+        #         pagination = diary_xml.find("pagination")
+        #         # New accounts have no data pages initially
+        #         total_pages_str = pagination.get("total_pages") if pagination is not None else None
+        #         total_pages = int(total_pages_str) if total_pages_str else 1
+        #     page += 1
 
-            if not exhaustive or page > total_pages:
-                break
+        #     if not exhaustive or page > total_pages:
+        #         break
 
         loadMediaContent = self._should_load_media(serviceRecord)
         if loadMediaContent:
-            fetch_posts = lambda page=1: self._get_feed_xml(serviceRecord, self._postsUrl, page)
+            fetch_posts = lambda page=1: self._get_diary_xml(serviceRecord, self._postsUrl, page)
             page = 1
             has_more = True
             while has_more:
@@ -307,12 +307,14 @@ class AerobiaService(ServiceBase):
         post.Name = post_xml.get("title")
         post.NotesExt = post_xml.get("formatted_body")
         post.StartTime = pytz.utc.localize(datetime.strptime(post_xml.get("created_at"), "%Y-%m-%dT%H:%M:%SZ"))
+        #need to set EndTime for consistency
+        post.EndTime = post.StartTime
 
         post.ServiceData = {"ActivityID": post_xml.get("id")}
 
         if int(post_xml.get("photos_count")) > 0:
             for photo_xml in data.findall("photos/photo"):
-                post.PhotoUrls.append({"id": photo_xml["id"], "url": photo_xml["image_original"]})
+                post.PhotoUrls.append({"id": photo_xml.get("id"), "url": photo_xml.get("image_original")})
 
         logger.debug("\tPost s/t {}: {}".format(post.StartTime, post.Type))
         post.CalculateUID()

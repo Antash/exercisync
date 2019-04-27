@@ -85,8 +85,7 @@ class LocalExporterService(ServiceBase):
         if not os.path.exists(root):
             return
         #TODO ensure all data downloaded before comressing and sending email and cleanup
-        if len(serviceRecord.SynchronizedActivities):
-            return
+
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
         zipf_name = os.path.join(USER_DATA_FILES, user_hash)
@@ -127,6 +126,8 @@ class LocalExporterService(ServiceBase):
         # store reports in the separate folder
         if activity.Type == ActivityType.Report:
             name_base = os.path.join(name_base, "Posts")
+            if not os.path.exists(name_base):
+                os.mkdir(name_base)
 
         day_name_chunk = activity.StartTime.strftime("%Y-%m-%d")
         filename_base = "{}_{}".format(day_name_chunk, activity.Type)

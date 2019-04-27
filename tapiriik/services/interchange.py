@@ -173,6 +173,9 @@ class Activity:
                 - Forcing the .NET model of "XYZCollection"s that enforce integrity seems wrong
                 - Enforcing them in constructors makes using the classes a pain
         """
+        # Reports do not contains exercise data so should pass sanity tests
+        if self.Type == ActivityType.Report:
+            return
         if "ServiceDataCollection" in self.__dict__:
             srcs = self.ServiceDataCollection  # this is just so I can see the source of the activity in the exception message
         if len(self.Laps) == 0:
