@@ -68,6 +68,9 @@ class LocalExporterService(ServiceBase):
         root = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         if not os.path.exists(root):
             os.mkdir(root)
+        posts_root = os.path.join(root, "Posts")
+        if not os.path.exists(posts_root):
+            os.mkdir(posts_root)
 
     def Authorize(self, username, password):
         return (username, {}, {"Email" : username, "Password": password})
@@ -84,14 +87,13 @@ class LocalExporterService(ServiceBase):
         root = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         if not os.path.exists(root):
             return
+
         #TODO ensure all data downloaded before comressing and sending email and cleanup
 
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
         zipf_name = os.path.join(USER_DATA_FILES, user_hash)
         shutil.make_archive(zipf_name, 'zip', user_folder)
-        # Not need raw data anymore
-        #self.DeleteCachedData(serviceRecord)
 
         context = {
             "url": "{}/download/{}".format(WEB_ROOT, user_hash)
@@ -100,9 +102,8 @@ class LocalExporterService(ServiceBase):
         send_email(serviceRecord.ExternalID, "Your Aerobia files", message, plaintext_message=plaintext_message)
 
     def DeleteCachedData(self, serviceRecord):
-        user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
-        if os.path.exists(user_folder):
-            shutil.rmtree(user_folder, ignore_errors=True)
+        # No need to delete
+        pass
 
     def DeleteActivity(self, serviceRecord, uploadId):
         # Not supported
@@ -121,13 +122,11 @@ class LocalExporterService(ServiceBase):
             else:
                 tcx_data = TCXIO.Dump(activity)
 
-        name_base = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
+        folder_base = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
 
         # store reports in the separate folder
         if activity.Type == ActivityType.Report:
-            name_base = os.path.join(name_base, "Posts")
-            if not os.path.exists(name_base):
-                os.mkdir(name_base)
+            folder_base = os.path.join(name_base, "Posts")
 
         day_name_chunk = activity.StartTime.strftime("%Y-%m-%d")
         filename_base = "{}_{}".format(day_name_chunk, activity.Type)
@@ -137,7 +136,7 @@ class LocalExporterService(ServiceBase):
             else:
                 filename_base = "{}_{}_{}".format(day_name_chunk, activity.Type, activity.Name)
         
-        name_base = os.path.join(name_base, filename_base)
+        name_base = os.path.join(folder_base, filename_base)
         
         if tcx_data:
             ext = ".tcx"
@@ -151,13 +150,15 @@ class LocalExporterService(ServiceBase):
                 file.write(tcx_data)
 
         if activity.NotesExt or len(activity.PhotoUrls):
-            ext = ""
-            folders_exists = 1
-            while os.path.exists(name_base + ext):
-                ext = "_{}".format(folders_exists)
-                folders_exists = folders_exists + 1
-            folder_base = name_base + ext
-            os.mkdir(folder_base)
+            # Create subfolder only when need to save multiple files
+            if tcx_data or len(activity.PhotoUrls):
+                ext = ""
+                folders_exists = 1
+                while os.path.exists(name_base + ext):
+                    ext = "_{}".format(folders_exists)
+                    folders_exists = folders_exists + 1
+                folder_base = name_base + ext
+                os.mkdir(folder_base)
 
             for url_data in activity.PhotoUrls:
                 img_file_name = "{}.jpg".format(url_data["id"])
@@ -168,12 +169,14 @@ class LocalExporterService(ServiceBase):
 
             if activity.NotesExt:
                 report_file_name = "{}.html".format(filename_base)
-                note_file = os.path.join(folder_base, "index.html")
+                note_file = os.path.join(folder_base, report_file_name)
                 with open(note_file, 'w') as file:
                     file.write(activity.NotesExt)
 
         return serviceRecord.ExternalID + activity.UID
 
     def RevokeAuthorization(self, serviceRecord):
-        # nothing to do here...
-        pass
+        # Remove all user content
+        user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
+        if os.path.exists(user_folder):
+            shutil.rmtree(user_folder, ignore_errors=True)

@@ -246,24 +246,24 @@ class AerobiaService(ServiceBase):
 
         fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, self._workoutsUrl, page)
 
-        # total_pages = None
-        # page = 1
-        # while True:
-        #     diary_xml = self._call(serviceRecord, fetch_diary, page)
+        total_pages = None
+        page = 1
+        while True:
+            diary_xml = self._call(serviceRecord, fetch_diary, page)
 
-        #     for workout_info in diary_xml.findall("workouts/r"):
-        #         activity = self._create_activity(workout_info)
-        #         activities.append(activity)
+            for workout_info in diary_xml.findall("workouts/r"):
+                activity = self._create_activity(workout_info)
+                activities.append(activity)
 
-        #     if total_pages is None:
-        #         pagination = diary_xml.find("pagination")
-        #         # New accounts have no data pages initially
-        #         total_pages_str = pagination.get("total_pages") if pagination is not None else None
-        #         total_pages = int(total_pages_str) if total_pages_str else 1
-        #     page += 1
+            if total_pages is None:
+                pagination = diary_xml.find("pagination")
+                # New accounts have no data pages initially
+                total_pages_str = pagination.get("total_pages") if pagination is not None else None
+                total_pages = int(total_pages_str) if total_pages_str else 1
+            page += 1
 
-        #     if not exhaustive or page > total_pages:
-        #         break
+            if not exhaustive or page > total_pages:
+                break
 
         loadMediaContent = self._should_load_media(serviceRecord)
         if loadMediaContent:
