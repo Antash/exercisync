@@ -2,7 +2,7 @@
 # (c) 2018 Anton Ashmarin, aashmarin@gmail.com
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.tcx import TCXIO
-from tapiriik.settings import USER_DATA_FILES
+from tapiriik.settings import USER_DATA_FILES, WEB_ROOT
 from tapiriik.services.interchange import ActivityType
 from tapiriik.web.email import generate_message_from_template, send_email
 
@@ -92,7 +92,7 @@ class LocalExporterService(ServiceBase):
         self.DeleteCachedData(serviceRecord)
 
         context = {
-            "url": "https://exercisync.com/download/{}".format(user_hash)
+            "url": "{}/download/{}".format(WEB_ROOT, user_hash)
         }
         message, plaintext_message = generate_message_from_template("email/data_download.html", context)
         send_email(serviceRecord.ExternalID, "Your Aerobia files", message, plaintext_message=plaintext_message)
