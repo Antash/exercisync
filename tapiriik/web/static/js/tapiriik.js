@@ -303,6 +303,13 @@ tapiriik.CreateDirectLoginForm = function(svcId){
 				if (typeof data.result === 'object' && data.result.type == "non_athlete_account" && svcId == "trainingpeaks") {
 					alert("It looks like you used a TrainingPeaks Coach account - you'll have to sign in with your individual account to continue.");
 				}
+				if (typeof data.result === 'object' && svcId == "localexporter") {
+					if (data.result.type == "not_a_valid_email") {
+						alert("Not a email address. Please enter your email to 'username' and 'password' fields.");
+					} else if (data.result.type == "emails_do_not_match") {
+						alert("Inputs don't match. Please enter same email to 'username' and 'password'.");
+					}
+				}
 				$(".error", form).hide();
 				$("#login-fail", form).show();
 				$("button",form).removeClass("disabled");

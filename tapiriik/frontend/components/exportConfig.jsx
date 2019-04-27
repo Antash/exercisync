@@ -17,7 +17,7 @@ export default class ExportConfig extends React.Component {
     render() {
         return (
             <div className="ruleRow">
-                Загрузить записи из ленты
+                Download posts and photos
                 <input
                     type="checkbox" 
                     defaultChecked={this.state.upload_media_content} 

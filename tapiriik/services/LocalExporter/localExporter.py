@@ -1,6 +1,7 @@
 # Local export module for exercisync
 # (c) 2018 Anton Ashmarin, aashmarin@gmail.com
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
+from tapiriik.services.api import APIException, UserException, UserExceptionType
 from tapiriik.services.tcx import TCXIO
 from tapiriik.settings import USER_DATA_FILES, WEB_ROOT
 from tapiriik.services.interchange import ActivityType
@@ -13,6 +14,7 @@ import shutil
 import zipfile
 import uuid
 import django
+import re
 
 # Make settings work (to send email)
 os.environ["DJANGO_SETTINGS_MODULE"] = "tapiriik.settings"
@@ -26,7 +28,6 @@ class LocalExporterService(ServiceBase):
     DisplayAbbreviation = "LE"
 
     AuthenticationType = ServiceAuthenticationType.UsernamePassword
-    RequiresExtendedAuthorizationDetails = True
 
     SupportsHR = SupportsCalories = SupportsCadence = SupportsTemp = SupportsPower = True
 
@@ -73,7 +74,11 @@ class LocalExporterService(ServiceBase):
             os.mkdir(posts_root)
 
     def Authorize(self, username, password):
-        return (username, {}, {"Email" : username, "Password": password})
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", username):
+            raise APIException("Not a email address. Please, enter your email.", user_exception=UserException(UserExceptionType.NotAValidEmail))
+        if username != password:
+            raise APIException("Inputs doesn't match. Please enter same email in both inputs.", user_exception=UserException(UserExceptionType.EmailsDoNotMatch))
+        return (username, {})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
         
