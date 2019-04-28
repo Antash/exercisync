@@ -81,7 +81,6 @@ class LocalExporterService(ServiceBase):
         return (username, {})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
-        
         return [], []
 
     def DownloadActivity(self, serviceRecord, activity):
@@ -94,6 +93,7 @@ class LocalExporterService(ServiceBase):
             return
 
         #TODO ensure all data downloaded before comressing and sending email and cleanup
+        #TODO send email once
 
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
@@ -131,7 +131,7 @@ class LocalExporterService(ServiceBase):
 
         # store reports in the separate folder
         if activity.Type == ActivityType.Report:
-            folder_base = os.path.join(name_base, "Posts")
+            folder_base = os.path.join(folder_base, "Posts")
 
         day_name_chunk = activity.StartTime.strftime("%Y-%m-%d")
         filename_base = "{}_{}".format(day_name_chunk, activity.Type)
