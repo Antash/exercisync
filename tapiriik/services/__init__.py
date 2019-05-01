@@ -44,6 +44,8 @@ from tapiriik.services.DecathlonCoach import DecathlonCoachService
 DecathlonCoach = DecathlonCoachService()
 from tapiriik.services.PolarPersonalTrainer import PolarPersonalTrainerService
 PolarPersonalTrainer = PolarPersonalTrainerService()
+from tapiriik.services.LocalExporter import LocalExporterService
+LocalExporter = LocalExporterService()
 
 PRIVATE_SERVICES = []
 try:

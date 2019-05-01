@@ -64,12 +64,18 @@ def aerobia(req):
 
     config = conn.GetConfiguration()
     gearRules = config["gearRules"] if "gearRules" in config else []
+    export = config["export"] if "export" in config else {}
+    upload_media = export["upload_media_content"] if "upload_media_content" in export else False
+    
     props = {
         'aerobiaId': conn.ExternalID,
         'userToken': conn.Authorization["OAuthToken"],
         'sportTypes': conn.Service.SupportedActivities,
         'config': {
-                'gearRules': gearRules
+                'gearRules': gearRules,
+                'export': {
+                    'upload_media_content': 1 if upload_media else 0
+                }
             }
     }
 
