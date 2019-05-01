@@ -65,10 +65,10 @@ class LocalExporterService(ServiceBase):
                     break
                 handle.write(block)
 
-    def _ensure_user_root_exists(self, serviceRecord):
+    def _ensure_user_root_exists(self, username):
         if not os.path.exists(USER_DATA_FILES):
             os.mkdir(USER_DATA_FILES)
-        root = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
+        root = os.path.join(USER_DATA_FILES, username)
         if not os.path.exists(root):
             os.mkdir(root)
         posts_root = os.path.join(root, "Posts")
@@ -81,6 +81,7 @@ class LocalExporterService(ServiceBase):
         if username != password:
             raise APIException("Inputs doesn't match. Please enter same email in both inputs.", user_exception=UserException(UserExceptionType.EmailsDoNotMatch))
 
+        self._ensure_user_root_exists(username)
         return (username, {})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
@@ -94,9 +95,6 @@ class LocalExporterService(ServiceBase):
         root = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         if not os.path.exists(root):
             return
-
-        #TODO ensure all data downloaded before comressing and sending email and cleanup
-        #TODO send email once
 
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
@@ -118,8 +116,6 @@ class LocalExporterService(ServiceBase):
         pass
 
     def UploadActivity(self, serviceRecord, activity):
-        self._ensure_user_root_exists(serviceRecord)
-
         tcx_data = None
         # Patch tcx with notes
         if activity.Type != ActivityType.Report:
