@@ -144,6 +144,7 @@ class LocalExporterService(ServiceBase):
             else:
                 filename_base = "{}_{}_{}".format(day_name_chunk, activity.Type, activity.Name)
         
+        filename_base = django.utils.text.get_valid_filename(filename_base)
         name_base = os.path.join(folder_base, filename_base)
         
         if tcx_data:
@@ -153,7 +154,6 @@ class LocalExporterService(ServiceBase):
                 ext = "_{}.tcx".format(file_exists)
                 file_exists = file_exists + 1
             tcx_file_name = name_base + ext
-            tcx_file_name = django.utils.text.get_valid_filename(tcx_file_name)
 
             with open(tcx_file_name, 'w', encoding="utf-8") as file:
                 file.write(tcx_data)
@@ -172,7 +172,6 @@ class LocalExporterService(ServiceBase):
             for url_data in activity.PhotoUrls:
                 img_file_name = "{}.jpg".format(url_data["id"])
                 img_file = os.path.join(folder_base, img_file_name)
-                img_file = django.utils.text.get_valid_filename(img_file)
                 if activity.NotesExt:
                     activity.NotesExt = activity.NotesExt.replace(url_data["url"], os.path.join(".", img_file_name))
                 self._download_image(url_data["url"], img_file)
@@ -180,7 +179,6 @@ class LocalExporterService(ServiceBase):
             if activity.NotesExt:
                 report_file_name = "{}.html".format(filename_base)
                 note_file = os.path.join(folder_base, report_file_name)
-                note_file = django.utils.text.get_valid_filename(note_file)
                 with open(note_file, 'w', encoding="utf-8") as file:
                     file.write(activity.NotesExt)
 
