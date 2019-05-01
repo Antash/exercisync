@@ -209,8 +209,8 @@ class AerobiaService(ServiceBase):
             try:
                 resp = request_call()
                 if resp.status_code == 200:
-                    break
-                # try to refresh token in case of none 200 responce status.
+                    if "/users/sign_up" not in resp.text and "info status=\"error\"" not in resp.text:
+                        break
                 # most likely token or session expired.
                 self._refresh_token(serviceRecord)
             except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as ex:
@@ -362,8 +362,14 @@ class AerobiaService(ServiceBase):
             return activity
 
         fetch_tcx = lambda: session.get("{}export/workouts/{}/tcx".format(self._urlRoot, activity_id), data=self._with_auth(serviceRecord))
+        
         tcx_data = self._safe_call(serviceRecord, fetch_tcx)
-        activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)
+        try:
+            activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)
+        except:
+            logger.debug("Unable to parse activity tcx: data corrupted")
+            raise APIException("Unable to parse activity tcx: data corrupted")
+
         # Obtain more information about activity
         fetch_more = lambda: session.get(self._workoutUrlJson.format(id=activity_id), data=self._with_auth(serviceRecord))
         res = self._safe_call(serviceRecord, fetch_more)
