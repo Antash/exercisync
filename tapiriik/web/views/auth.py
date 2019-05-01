@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render, redirect
 from tapiriik.services import Service
 from tapiriik.auth import User
+from tapiriik.database import db
+from tapiriik.settings import PRIMARY_HOST_NAME
 import json
 
 
@@ -40,6 +42,13 @@ def auth_do(req, service):
             User.Ensure(req)
         # link service to user account, possible merge happens behind the scenes (but doesn't effect active user)
         User.ConnectService(req.user, serviceRecord)
+
+        # TODO do other way. May be possible to achieve during LocalService auth?
+        # restrict sync to primary server to ensure data is accessible by the web server
+        # in case we are connecting local exporter
+        if PRIMARY_HOST_NAME:
+            db.users.update({"ConnectedServices.Service": service}, {"$set": {"SynchronizationHostRestriction": PRIMARY_HOST_NAME}})
+
         return True
     return False
 

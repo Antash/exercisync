@@ -3,10 +3,12 @@
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.api import APIException, UserException, UserExceptionType
 from tapiriik.services.tcx import TCXIO
-from tapiriik.settings import USER_DATA_FILES, WEB_ROOT
+from tapiriik.settings import USER_DATA_FILES, WEB_ROOT, PRIMARY_HOST_NAME
 from tapiriik.services.interchange import ActivityType
 from tapiriik.web.email import generate_message_from_template, send_email
+from tapiriik.database import db
 
+import django.utils.text
 import os
 import logging
 import requests
@@ -78,6 +80,7 @@ class LocalExporterService(ServiceBase):
             raise APIException("Not a email address. Please, enter your email.", user_exception=UserException(UserExceptionType.NotAValidEmail))
         if username != password:
             raise APIException("Inputs doesn't match. Please enter same email in both inputs.", user_exception=UserException(UserExceptionType.EmailsDoNotMatch))
+
         return (username, {})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
@@ -150,8 +153,9 @@ class LocalExporterService(ServiceBase):
                 ext = "_{}.tcx".format(file_exists)
                 file_exists = file_exists + 1
             tcx_file_name = name_base + ext
+            tcx_file_name = django.utils.text.get_valid_filename(tcx_file_name)
 
-            with open(tcx_file_name, 'w') as file:
+            with open(tcx_file_name, 'w', encoding="utf-8") as file:
                 file.write(tcx_data)
 
         if activity.NotesExt or len(activity.PhotoUrls):
@@ -168,6 +172,7 @@ class LocalExporterService(ServiceBase):
             for url_data in activity.PhotoUrls:
                 img_file_name = "{}.jpg".format(url_data["id"])
                 img_file = os.path.join(folder_base, img_file_name)
+                img_file = django.utils.text.get_valid_filename(img_file)
                 if activity.NotesExt:
                     activity.NotesExt = activity.NotesExt.replace(url_data["url"], os.path.join(".", img_file_name))
                 self._download_image(url_data["url"], img_file)
@@ -175,7 +180,8 @@ class LocalExporterService(ServiceBase):
             if activity.NotesExt:
                 report_file_name = "{}.html".format(filename_base)
                 note_file = os.path.join(folder_base, report_file_name)
-                with open(note_file, 'w') as file:
+                note_file = django.utils.text.get_valid_filename(note_file)
+                with open(note_file, 'w', encoding="utf-8") as file:
                     file.write(activity.NotesExt)
 
         return serviceRecord.ExternalID + activity.UID
@@ -185,3 +191,6 @@ class LocalExporterService(ServiceBase):
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder, ignore_errors=True)
+
+        # Unset user host restriction
+        db.users.update({"ConnectedServices.ID": serviceRecord._id}, {"$unset": {"SynchronizationHostRestriction": None}})

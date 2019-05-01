@@ -209,7 +209,8 @@ class AerobiaService(ServiceBase):
             try:
                 resp = request_call()
                 if resp.status_code == 200:
-                    if "/users/sign_up" not in resp.text and "info status=\"error\"" not in resp.text:
+                    # For some reason aerobia api always return 200 instead of 401
+                    if "/users/sign_up" not in resp.text and "неверный ключ аутентификации" not in resp.text.lower():
                         break
                 # most likely token or session expired.
                 self._refresh_token(serviceRecord)
