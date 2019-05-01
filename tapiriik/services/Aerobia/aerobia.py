@@ -213,9 +213,10 @@ class AerobiaService(ServiceBase):
                 # try to refresh token in case of none 200 responce status.
                 # most likely token or session expired.
                 self._refresh_token(serviceRecord)
-            except requests.exceptions.ConnectTimeout as ex:
+            except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as ex:
                 # Aerobia sometimes answer like
-                # Failed to establish a new connection: [WinError 10060] may happen while listing.
+                # "Remote end closed connection without response"
+                # "Failed to establish a new connection: [WinError 10060]"
                 # wait a bit and retry
                 time.sleep(.2)
         if resp is None:
@@ -367,7 +368,7 @@ class AerobiaService(ServiceBase):
         fetch_more = lambda: session.get(self._workoutUrlJson.format(id=activity_id), data=self._with_auth(serviceRecord))
         res = self._safe_call(serviceRecord, fetch_more)
         activity_data = res.json()
-        activity_ex.Name = activity_data["name"]
+        activity_ex.Name = activity_data["name"] if "name" in activity_data else ""
 
         if "photos" in activity_data["post"]:
             for img_info in activity_data["post"]["photos"]:
