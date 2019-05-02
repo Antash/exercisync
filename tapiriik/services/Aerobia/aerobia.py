@@ -203,11 +203,18 @@ class AerobiaService(ServiceBase):
 
         return user_id, user_token
 
-    def _safe_call(self, serviceRecord, request_call, retry_count=3):
+    def _safe_call(self, serviceRecord, method, endpoint, params={}, files=None, retry_count=3):
         resp = None
         for i in range(0, retry_count):
             try:
-                resp = request_call()
+                session = self._get_session(serviceRecord)
+                if method == "get":
+                    resp = session.get(endpoint, params=self._with_auth(serviceRecord, params))
+                elif method == "post":
+                    resp = session.post(endpoint, data=self._with_auth(serviceRecord, params), files=files)
+                else:
+                    raise APIException("Unsupported method: {}".format(method), user_exception=UserException(UserExceptionType.Other))
+
                 if resp.status_code == 200:
                     # For some reason aerobia api always return 200 instead of 401
                     if "/users/sign_up" not in resp.text and "неверный ключ аутентификации" not in resp.text.lower():
@@ -294,9 +301,7 @@ class AerobiaService(ServiceBase):
         return activities, exclusions
 
     def _get_diary_xml(self, serviceRecord, endpoint, page=1):
-        session = self._get_session(serviceRecord)
-        fetch_diary = lambda: session.get(endpoint, params=self._with_auth(serviceRecord, {"page": page}))
-        diary_data = self._safe_call(serviceRecord, fetch_diary)
+        diary_data = self._safe_call(serviceRecord, "get", endpoint, {"page": page})
         diary_xml = etree.fromstring(diary_data.text.encode('utf-8'))
 
         info = diary_xml.find("info")
@@ -355,16 +360,13 @@ class AerobiaService(ServiceBase):
         return activity
 
     def DownloadActivity(self, serviceRecord, activity):
-        session = self._get_session(serviceRecord)
         activity_id = activity.ServiceData["ActivityID"]
 
         # reports already contains all data
         if activity.Type == ActivityType.Report:
             return activity
 
-        fetch_tcx = lambda: session.get("{}export/workouts/{}/tcx".format(self._urlRoot, activity_id), data=self._with_auth(serviceRecord))
-        
-        tcx_data = self._safe_call(serviceRecord, fetch_tcx)
+        tcx_data = self._safe_call(serviceRecord, "get", "{}export/workouts/{}/tcx".format(self._urlRoot, activity_id))
         try:
             activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)
         except:
@@ -372,8 +374,7 @@ class AerobiaService(ServiceBase):
             raise APIException("Unable to parse activity tcx: data corrupted")
 
         # Obtain more information about activity
-        fetch_more = lambda: session.get(self._workoutUrlJson.format(id=activity_id), data=self._with_auth(serviceRecord))
-        res = self._safe_call(serviceRecord, fetch_more)
+        res = self._safe_call(serviceRecord, "get", self._workoutUrlJson.format(id=activity_id))
         activity_data = res.json()
         activity_ex.Name = activity_data["name"] if "name" in activity_data else ""
 
@@ -403,7 +404,6 @@ class AerobiaService(ServiceBase):
         return activity_ex
 
     def UploadActivity(self, serviceRecord, activity):
-        session = self._get_session(serviceRecord)
         tcx_data = None
         # If some service provides ready-to-use tcx data why not to use it?
         if "tcx" in activity.PrerenderedFormats:
@@ -419,8 +419,7 @@ class AerobiaService(ServiceBase):
         data = {"name": activity_name,
                 "description": activity.Notes}
         files = {"file": ("tap-sync-{}-{}.tcx".format(os.getpid(), activity.UID), tcx_data)}
-        upload_tcx = lambda: session.post(self._uploadsUrl, data=self._with_auth(serviceRecord, data), files=files)
-        res = self._safe_call(serviceRecord, upload_tcx)
+        res = self._safe_call(serviceRecord, "post", self._uploadsUrl, data, files)
         res_obj = res.json()
         uploaded_id = res_obj["workouts"][0]["id"]
 
@@ -453,12 +452,9 @@ class AerobiaService(ServiceBase):
             data.update({"workout[inventory_ids][]": inventory})
 
     def _patch_activity(self, serviceRecord, data, activity_id):
-        session = self._get_session(serviceRecord)
-
         data.update({"_method": "put"})
-        update_activity = lambda: session.post(self._workoutUrl.format(id=activity_id), data=self._with_auth(serviceRecord, data))
         try:
-            self._safe_call(serviceRecord, update_activity)
+            self._safe_call(serviceRecord, "post", self._workoutUrl.format(id=activity_id), data)
         except Exception as e:
             # do nothing but logging - anything critical happened to interrupt process
             logger.debug("Unable to patch activity: " + e)
@@ -469,10 +465,8 @@ class AerobiaService(ServiceBase):
         #return self.UserActivityURL.format(userId, uploadId)
 
     def DeleteActivity(self, serviceRecord, uploadId):
-        session = self._get_session(serviceRecord)
         delete_parameters = {"_method" : "delete"}
-        delete_call = lambda: session.post("{}workouts/{}".format(self._urlRoot, uploadId), data=self._with_auth(serviceRecord, delete_parameters))
-        self._safe_call(serviceRecord, delete_call)
+        self._safe_call(serviceRecord, "post", "{}workouts/{}".format(self._urlRoot, uploadId), delete_parameters)
 
     def DeleteCachedData(self, serviceRecord):
         pass  # No cached data...
