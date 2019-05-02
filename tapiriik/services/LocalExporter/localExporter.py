@@ -8,6 +8,7 @@ from tapiriik.services.interchange import ActivityType
 from tapiriik.web.email import generate_message_from_template, send_email
 from tapiriik.database import db
 
+import socket
 import django.utils.text
 import os
 import logging
@@ -56,7 +57,7 @@ class LocalExporterService(ServiceBase):
     ]
 
     def _download_image(self, image_url, file_name):
-        with open(file_name, 'wb') as handle:
+        with open(file_name.decode("utf8"), 'wb') as handle:
             response = requests.get(image_url, stream=True)
             if not response.ok:
                 logger.debug("Error downloading file {}: {}".format(image_url, response))
@@ -101,11 +102,25 @@ class LocalExporterService(ServiceBase):
         zipf_name = os.path.join(USER_DATA_FILES, user_hash)
         shutil.make_archive(zipf_name, 'zip', user_folder)
 
+        # To reduce disk usage delete all data except the result archive
+        # but keep root structure cause user is not yed disconnected
+        shutil.rmtree(user_folder, ignore_errors=True)
+        self._ensure_user_root_exists(serviceRecord.ExternalID)
+
+        file_url = "{}/download/{}".format(WEB_ROOT, user_hash)
+
+        host = socket.gethostname()
+        if PRIMARY_HOST_NAME != host:
+            # send zip archive to the http server node
+            with open(zipf_name + ".zip", 'rb') as file:
+                requests.post(file_url, data=file)
+
         context = {
-            "url": "{}/download/{}".format(WEB_ROOT, user_hash)
+            "url": file_url
         }
         message, plaintext_message = generate_message_from_template("email/data_download.html", context)
         send_email(serviceRecord.ExternalID, "Your Aerobia files", message, plaintext_message=plaintext_message)
+
 
     def DeleteCachedData(self, serviceRecord):
         # No need to delete
@@ -151,7 +166,7 @@ class LocalExporterService(ServiceBase):
                 file_exists = file_exists + 1
             tcx_file_name = name_base + ext
 
-            with open(tcx_file_name, 'w', encoding="utf-8") as file:
+            with open(tcx_file_name.decode("utf8"), 'w', encoding="utf-8") as file:
                 file.write(tcx_data)
 
         if activity.NotesExt or len(activity.PhotoUrls):
@@ -163,7 +178,7 @@ class LocalExporterService(ServiceBase):
                     ext = "_{}".format(folders_exists)
                     folders_exists = folders_exists + 1
                 folder_base = name_base + ext
-                os.mkdir(folder_base)
+                os.mkdir(folder_base.decode("utf8"))
 
             for url_data in activity.PhotoUrls:
                 img_file_name = "{}.jpg".format(url_data["id"])
@@ -175,7 +190,7 @@ class LocalExporterService(ServiceBase):
             if activity.NotesExt:
                 report_file_name = "{}.html".format(filename_base)
                 note_file = os.path.join(folder_base, report_file_name)
-                with open(note_file, 'w', encoding="utf-8") as file:
+                with open(note_file.decode("utf8"), 'w', encoding="utf-8") as file:
                     file.write(activity.NotesExt)
 
         return serviceRecord.ExternalID + activity.UID
