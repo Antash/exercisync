@@ -1010,7 +1010,7 @@ class SynchronizationTask:
                                     raise ActivityShouldNotSynchronizeException()
 
                         if self._user_config["sync_skip_before"]:
-                            if self._user_config["historical_sync"]:
+                            if "historical_sync" in self._user_config and self._user_config["historical_sync"]:
                                 if activity.StartTime.replace(tzinfo=None) > self._user_config["sync_skip_before"]:
                                     logger.info("\t\t...predates configured sync window")
                                     activity.Record.MarkAsNotPresentOtherwise(UserException(UserExceptionType.PredatesWindow))
