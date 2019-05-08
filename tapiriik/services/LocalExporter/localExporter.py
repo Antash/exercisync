@@ -86,6 +86,7 @@ class LocalExporterService(ServiceBase):
         return (username, {})
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
+        self._ensure_user_root_exists(serviceRecord.ExternalID)
         return [], []
 
     def DownloadActivity(self, serviceRecord, activity):
