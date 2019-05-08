@@ -239,7 +239,8 @@ class AerobiaService(ServiceBase):
         db.connections.update({"_id": record._id}, {"$set": {"Authorization": auth_datails}})
 
     def _should_load_media(self, serviceRecord):
-        return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+        return True
+        #return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
 
     def _with_auth(self, record, params={}):
         params.update({"authentication_token": record.Authorization["OAuthToken"]})

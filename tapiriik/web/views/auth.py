@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect
 from tapiriik.services import Service
 from tapiriik.auth import User
 from tapiriik.database import db
-from tapiriik.settings import PRIMARY_HOST_NAME
+from bson.objectid import ObjectId
+
 import json
 
 
@@ -43,11 +44,10 @@ def auth_do(req, service):
         # link service to user account, possible merge happens behind the scenes (but doesn't effect active user)
         User.ConnectService(req.user, serviceRecord)
 
-        # TODO do other way. May be possible to achieve during LocalService auth?
-        # restrict sync to primary server to ensure data is accessible by the web server
         # in case we are connecting local exporter
-        if PRIMARY_HOST_NAME:
-            db.users.update({"ConnectedServices.Service": service}, {"$set": {"SynchronizationHostRestriction": PRIMARY_HOST_NAME}})
+        # set default settings
+        if service == "localexporter":
+            db.users.update({"_id": ObjectId(req.user["_id"])}, {"$set": {"Config": {"sync_skip_before": None}, "NextSyncIsExhaustive": True}})
 
         return True
     return False
