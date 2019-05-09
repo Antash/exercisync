@@ -124,6 +124,8 @@ class LocalExporterService(ServiceBase):
             if resp.status_code != 200:
                 logger.debug("Error uploading user file to primary host. (user: {}, file: {}".format(serviceRecord.ExternalID, zipf_name))
                 raise APIException("Error uploading user file.", user_exception=UserException(UserExceptionType.Other))
+            # Remove unused archive
+            os.remove(zipf_name + ".zip")
 
         context = {
             "url": file_url
