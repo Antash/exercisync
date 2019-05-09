@@ -98,7 +98,7 @@ class LocalExporterService(ServiceBase):
         if not os.path.exists(root):
             return
 
-        posts_root = os.path.join(posts_root, "Posts")
+        posts_root = os.path.join(root, "Posts")
         # No new files downloaded, skip sending email
         if len(os.listdir(root)) <= 1 and len(os.listdir(posts_root)) <= 0:
             return
