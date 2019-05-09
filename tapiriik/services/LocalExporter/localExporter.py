@@ -98,6 +98,11 @@ class LocalExporterService(ServiceBase):
         if not os.path.exists(root):
             return
 
+        posts_root = os.path.join(posts_root, "Posts")
+        # No new files downloaded, skip sending email
+        if len(os.listdir(root)) <= 1 and len(os.listdir(posts_root)) <= 0:
+            return
+
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         user_hash = uuid.uuid4().hex
         zipf_name = os.path.join(USER_DATA_FILES, user_hash)
@@ -204,6 +209,3 @@ class LocalExporterService(ServiceBase):
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder, ignore_errors=True)
-
-        # Unset user host restriction
-        db.users.update({"ConnectedServices.ID": serviceRecord._id}, {"$unset": {"SynchronizationHostRestriction": None}})
