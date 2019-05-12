@@ -7,6 +7,7 @@ from tapiriik.settings import USER_DATA_FILES, WEB_ROOT, PRIMARY_HOST_NAME
 from tapiriik.services.interchange import ActivityType
 from tapiriik.web.email import generate_message_from_template, send_email
 from tapiriik.database import db
+from bson.objectid import ObjectId
 
 import socket
 import django.utils.text
@@ -87,6 +88,11 @@ class LocalExporterService(ServiceBase):
 
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
         self._ensure_user_root_exists(serviceRecord.ExternalID)
+
+        # restrict host to ensure downloaded activities are located on a single server
+        host = socket.gethostname()
+        db.users.update({"ConnectedServices.ID": ObjectId(serviceRecord._id)}, {"$set": {"SynchronizationHostRestriction": host}})
+
         return [], []
 
     def DownloadActivity(self, serviceRecord, activity):
@@ -132,6 +138,9 @@ class LocalExporterService(ServiceBase):
         }
         message, plaintext_message = generate_message_from_template("email/data_download.html", context)
         send_email(serviceRecord.ExternalID, "Your Aerobia files", message, plaintext_message=plaintext_message)
+        # release host restriction
+        db.users.update({"ConnectedServices.ID": ObjectId(serviceRecord._id)}, {"$unset": {"SynchronizationHostRestriction": None}})
+
 
     def DeleteCachedData(self, serviceRecord):
         # No need to delete
