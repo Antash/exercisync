@@ -1,9 +1,8 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 
-import CSRFToken from './components/csrftoken'
-import RuleList from './components/ruleList'
-import ExportConfig from './components/exportConfig'
+import CSRFToken from './csrftoken'
+import RuleList from './ruleList'
+import ExportConfig from './exportConfig'
 
 const urlGears = (userid, token) =>
     `http://aerobia.ru/users/${userid}/equipments?authentication_token=${token}`
@@ -65,11 +64,7 @@ class AerobiaConfig extends React.Component {
     updateGearRules(newState) {
         this.setState({gearRules: newState.rules});
     }
-
-    submitForm() {
-        $.post('/aerobiaConfig', JSON.stringify({ gearRules: this.state.gearRules, export: this.state.export }));
-    }
-
+    
     render() {
         const { sportTypes } = this.props;
         if (this.state.gears.length == 0)
@@ -112,7 +107,4 @@ class AerobiaConfig extends React.Component {
     }
 }
 
-ReactDOM.render(
-    React.createElement(AerobiaConfig, window.props),
-    window.react_mount,
-)
+export default AerobiaConfig;

@@ -153,6 +153,12 @@ tapiriik.AddressChanged=function(){
 			document.location = "../../aerobiaConfig"
 			return;
 		}
+		if (components[1]=="localexporter" && components[2]=="setup"){
+			//TODO dirty hack
+			//going to separate view to make react work
+			document.location = "../../localExporterConfig"
+			return;
+		}
 		tapiriik.DoDismissServiceDialog();
 		tapiriik.OpenServiceConfigPanel(components[1]);
 		return;

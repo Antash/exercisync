@@ -33,6 +33,9 @@ class LocalExporterService(ServiceBase):
 
     AuthenticationType = ServiceAuthenticationType.UsernamePassword
 
+    Configurable = True
+    ConfigurationDefaults = {}
+
     SupportsHR = SupportsCalories = SupportsCadence = SupportsTemp = SupportsPower = True
 
     SupportedActivities = [
@@ -117,30 +120,28 @@ class LocalExporterService(ServiceBase):
         # To reduce disk usage delete all data except the result archive
         # but keep root structure cause user is not yed disconnected
         shutil.rmtree(user_folder, ignore_errors=True)
-        self._ensure_user_root_exists(serviceRecord.ExternalID)
+        #self._ensure_user_root_exists(serviceRecord.ExternalID)
 
         file_url = "{}/download/{}".format(WEB_ROOT, user_hash)
 
-        host = socket.gethostname()
-        if PRIMARY_HOST_NAME != host:
-            # send zip archive to the http server node
-            with open(zipf_name + ".zip", 'rb') as fileHandler:
-                file = {'file': (zipf_name, fileHandler)}
-                resp = requests.post(file_url, files=file)
-            if resp.status_code != 200:
-                logger.debug("Error uploading user file to primary host. (user: {}, file: {}".format(serviceRecord.ExternalID, zipf_name))
-                raise APIException("Error uploading user file.", user_exception=UserException(UserExceptionType.Other))
-            # Remove unused archive
-            os.remove(zipf_name + ".zip")
+        #host = socket.gethostname()
+        # if PRIMARY_HOST_NAME != host:
+        #     # send zip archive to the http server node
+        #     with open(zipf_name + ".zip", 'rb') as fileHandler:
+        #         file = {'file': (zipf_name, fileHandler)}
+        #         resp = requests.post(file_url, files=file)
+        #     if resp.status_code != 200:
+        #         logger.debug("Error uploading user file to primary host. (user: {}, file: {}, code: {}, data: {}".format(serviceRecord.ExternalID, zipf_name, resp.status_code, resp.text))
+        #         raise APIException("Error uploading user file.", user_exception=UserException(UserExceptionType.Other))
+        #     # Remove unused archive
+        #     os.remove(zipf_name + ".zip")
 
         context = {
             "url": file_url
         }
         message, plaintext_message = generate_message_from_template("email/data_download.html", context)
+        logger.debug("Sending email with activities {} to {}".format(user_hash, serviceRecord.ExternalID))
         send_email(serviceRecord.ExternalID, "Your Aerobia files", message, plaintext_message=plaintext_message)
-        # release host restriction
-        db.users.update({"ConnectedServices.ID": ObjectId(serviceRecord._id)}, {"$unset": {"SynchronizationHostRestriction": None}})
-
 
     def DeleteCachedData(self, serviceRecord):
         # No need to delete
@@ -220,3 +221,6 @@ class LocalExporterService(ServiceBase):
         user_folder = os.path.join(USER_DATA_FILES, serviceRecord.ExternalID)
         if os.path.exists(user_folder):
             shutil.rmtree(user_folder, ignore_errors=True)
+        # release host restriction
+        db.users.update({"ConnectedServices.ID": ObjectId(serviceRecord._id)}, {"$unset": {"SynchronizationHostRestriction": None}})
+

@@ -68,6 +68,7 @@ def aerobia(req):
     upload_media = export["upload_media_content"] if "upload_media_content" in export else False
     
     props = {
+        'component': 'aerobia',
         'aerobiaId': conn.ExternalID,
         'userToken': conn.Authorization["OAuthToken"],
         'sportTypes': conn.Service.SupportedActivities,
@@ -82,9 +83,38 @@ def aerobia(req):
     if req.method == "POST":
         form = AerobiaConfigForm(req.POST)
         if form.is_valid():
-            configRaw = req.POST.get('config')
+            configRaw = req.POST
             config = json.loads(configRaw)
             conn.SetConfiguration(config)
             return redirect("dashboard")
 
     return render(req, "config/aerobia.html", {'props': props})
+
+
+class LocalExporterConfigForm(forms.Form):
+    pass
+
+def localexporter(req):
+    if not req.user:
+        return HttpResponse(status=403)
+    conn = User.GetConnectionRecord(req.user, "localexporter")
+
+    config = conn.GetConfiguration()
+    download_media = config["download_only_media_content"] if "download_only_media_content" in config else False
+    
+    props = {
+        'component': 'localexporter',
+        'config': {
+            'download_only_media_content': 1 if download_media else 0
+        }
+    }
+
+    if req.method == "POST":
+        form = LocalExporterConfigForm(req.POST)
+        if form.is_valid():
+            configRaw = req.POST.get('config')
+            config = json.loads(configRaw)
+            conn.SetConfiguration(config)
+            return redirect("dashboard")
+
+    return render(req, "config/localexporter.html", {'props': props})

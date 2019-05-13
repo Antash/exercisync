@@ -6,7 +6,7 @@ module.exports = {
   context: __dirname,
 
   entry: {
-    aerobiaConfig: './tapiriik/frontend/aerobiaConfig',
+    exercisyncApp: './tapiriik/frontend/app',
   },
 
   output: {
