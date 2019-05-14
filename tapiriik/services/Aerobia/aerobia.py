@@ -363,12 +363,16 @@ class AerobiaService(ServiceBase):
     def DownloadActivity(self, serviceRecord, activity):
         activity_id = activity.ServiceData["ActivityID"]
 
-        # reports already contains all data
-        if activity.Type == ActivityType.Report:
-            return activity
-
         load_media_only = self._should_load_media_only(serviceRecord)
         min_report_length = self._get_min_report_length(serviceRecord)
+
+        # reports already contains all data
+        if activity.Type == ActivityType.Report:
+            # ignore short posts without photos
+            if len(activity.PhotoUrls) == 0 and load_media_only:
+                if len(activity.NotesExt) < min_report_length:
+                    activity.Ignore = True
+            return activity
 
         # Obtain more information about activity
         res = self._safe_call(serviceRecord, "get", self._workoutUrlJson.format(id=activity_id))
