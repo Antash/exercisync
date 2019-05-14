@@ -77,6 +77,7 @@ class Activity:
         self.Device = device
         self.NotesExt = notes
         self.PhotoUrls = []
+        self.Ignore = False
 
     def CalculateUID(self):
         if not self.StartTime:

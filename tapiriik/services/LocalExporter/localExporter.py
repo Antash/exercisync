@@ -33,8 +33,8 @@ class LocalExporterService(ServiceBase):
 
     AuthenticationType = ServiceAuthenticationType.UsernamePassword
 
-    Configurable = True
-    ConfigurationDefaults = {}
+    #Configurable = True
+    #ConfigurationDefaults = {}
 
     SupportsHR = SupportsCalories = SupportsCadence = SupportsTemp = SupportsPower = True
 
@@ -69,6 +69,9 @@ class LocalExporterService(ServiceBase):
                 if not block:
                     break
                 handle.write(block)
+
+    def _should_load_media_only(self, serviceRecord):
+        return serviceRecord.Config["download_only_media_content"] if "download_only_media_content" in serviceRecord.Config else False
 
     def _ensure_user_root_exists(self, username):
         if not os.path.exists(USER_DATA_FILES):
@@ -152,7 +155,13 @@ class LocalExporterService(ServiceBase):
         pass
 
     def UploadActivity(self, serviceRecord, activity):
+        #load_media_only = self._should_load_media_only(serviceRecord)
+        #skip ignored activities
+        if activity.Ignore:
+            return serviceRecord.ExternalID + activity.UID
+
         tcx_data = None
+
         # Patch tcx with notes
         if activity.Type != ActivityType.Report:
             if not activity.NotesExt and activity.Notes:

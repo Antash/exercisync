@@ -15,6 +15,7 @@ export default class LocalExporterConfig extends React.Component {
 
     submitForm() {
         $.post('/localExporterConfig', {'config': JSON.stringify(this.state)});
+        window.location.href = "/";
     }
 
     render() {

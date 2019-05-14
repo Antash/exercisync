@@ -6,6 +6,7 @@ local_settings.py
 *.sublime-*
 private/
 node_modules/
+export_data/
 webpack-stats.json
 .vscode/
 *.hot-update.js

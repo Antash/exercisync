@@ -66,7 +66,8 @@ def aerobia(req):
     gearRules = config["gearRules"] if "gearRules" in config else []
     export = config["export"] if "export" in config else {}
     upload_media = export["upload_media_content"] if "upload_media_content" in export else False
-    
+    min_report_length = export["min_report_length"] if "min_report_length" in export else 1000
+
     props = {
         'component': 'aerobia',
         'aerobiaId': conn.ExternalID,
@@ -75,7 +76,8 @@ def aerobia(req):
         'config': {
                 'gearRules': gearRules,
                 'export': {
-                    'upload_media_content': 1 if upload_media else 0
+                    'upload_media_content': 1 if upload_media else 0,
+                    'min_report_length': min_report_length
                 }
             }
     }
@@ -83,7 +85,7 @@ def aerobia(req):
     if req.method == "POST":
         form = AerobiaConfigForm(req.POST)
         if form.is_valid():
-            configRaw = req.POST
+            configRaw = req.POST.get('config')
             config = json.loads(configRaw)
             conn.SetConfiguration(config)
             return redirect("dashboard")

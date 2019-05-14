@@ -34,7 +34,7 @@ class AerobiaService(ServiceBase):
     Configurable = True
     ConfigurationDefaults = {}
 
-    # notes longer than this number considered as reports and being saved separatelly
+    # notes longer than this number by default considered as reports and being saved separatelly
     REPORT_MIN_LIMIT = 1000
 
     # common -> aerobia (garmin tcx sport names)
@@ -238,9 +238,11 @@ class AerobiaService(ServiceBase):
         record.Authorization.update(auth_datails)
         db.connections.update({"_id": record._id}, {"$set": {"Authorization": auth_datails}})
 
-    def _should_load_media(self, serviceRecord):
-        return True
-        #return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+    def _should_load_media_only(self, serviceRecord):
+        return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+
+    def _get_min_report_length(self, serviceRecord):
+        return serviceRecord.Config["export"]["min_report_length"] if "export" in serviceRecord.Config else REPORT_MIN_LIMIT
 
     def _with_auth(self, record, params={}):
         params.update({"authentication_token": record.Authorization["OAuthToken"]})
@@ -281,23 +283,21 @@ class AerobiaService(ServiceBase):
             if not exhaustive or page > total_pages:
                 break
 
-        loadMediaContent = self._should_load_media(serviceRecord)
-        if loadMediaContent:
-            page = 1
-            has_more = True
-            while has_more:
-                feed_xml = self._get_diary_xml(serviceRecord, self._postsUrl, page)
+        page = 1
+        has_more = True
+        while has_more:
+            feed_xml = self._get_diary_xml(serviceRecord, self._postsUrl, page)
 
-                for post_info in feed_xml.findall("posts/r"):
-                    activity = self._create_post(post_info)
-                    activities.append(activity)
+            for post_info in feed_xml.findall("posts/r"):
+                activity = self._create_post(post_info)
+                activities.append(activity)
 
-                pagination = feed_xml.find("pagination")
-                has_more = pagination.get("more") == "true" if pagination is not None else False
-                page += 1
+            pagination = feed_xml.find("pagination")
+            has_more = pagination.get("more") == "true" if pagination is not None else False
+            page += 1
 
-                if not exhaustive:
-                    break
+            if not exhaustive:
+                break
 
         return activities, exclusions
 
@@ -367,6 +367,18 @@ class AerobiaService(ServiceBase):
         if activity.Type == ActivityType.Report:
             return activity
 
+        load_media_only = self._should_load_media_only(serviceRecord)
+        min_report_length = self._get_min_report_length(serviceRecord)
+
+        # Obtain more information about activity
+        res = self._safe_call(serviceRecord, "get", self._workoutUrlJson.format(id=activity_id))
+        activity_data = res.json()
+        
+        if "photos" not in activity_data["post"] and load_media_only:
+            # Ignore activities without media
+            activity.Ignore = True
+            return activity
+
         tcx_data = self._safe_call(serviceRecord, "get", "{}export/workouts/{}/tcx".format(self._urlRoot, activity_id))
         try:
             activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)
@@ -374,9 +386,6 @@ class AerobiaService(ServiceBase):
             logger.debug("Unable to parse activity tcx: data corrupted")
             raise APIException("Unable to parse activity tcx: data corrupted")
 
-        # Obtain more information about activity
-        res = self._safe_call(serviceRecord, "get", self._workoutUrlJson.format(id=activity_id))
-        activity_data = res.json()
         activity_ex.Name = activity_data["name"] if "name" in activity_data else ""
 
         if "photos" in activity_data["post"]:
@@ -391,8 +400,12 @@ class AerobiaService(ServiceBase):
                 style.decompose()
             activity_ex.Notes = soup.getText()
             # all notes with photos considered as reports
-            if len(activity_ex.Notes) > self.REPORT_MIN_LIMIT or len(activity_ex.PhotoUrls):
-                activity_ex.NotesExt = soup.prettify()
+            if len(activity_ex.Notes) < min_report_length:
+                if len(activity_ex.PhotoUrls):
+                    activity_ex.NotesExt = soup.prettify()
+                elif load_media_only:
+                    # ignore activities with a very short notes
+                    activity_ex.Ignore = True
 
         # Dirty hack to patch users inventory even if they use aerobia mobile app to record activities
         # Still need to sync with some service though.
