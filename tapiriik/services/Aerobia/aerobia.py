@@ -369,9 +369,8 @@ class AerobiaService(ServiceBase):
         # reports already contains all data
         if activity.Type == ActivityType.Report:
             # ignore short posts without photos
-            if len(activity.PhotoUrls) == 0 and load_media_only:
-                if len(activity.NotesExt) < min_report_length:
-                    activity.Ignore = True
+            if not len(activity.PhotoUrls) and len(activity.NotesExt) < min_report_length:
+                activity.Ignore = True
             return activity
 
         # Obtain more information about activity

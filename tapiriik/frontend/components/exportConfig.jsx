@@ -36,7 +36,7 @@ export default class ExportConfig extends React.Component {
                     Игнорировать отчеты без фотографий короче 
                     <input
                         type="text"
-                        defaultValue="1000"
+                        defaultValue={this.state.min_report_length}
                         onChange={this.lengthChanged.bind(this)}
                     />
                     символов
