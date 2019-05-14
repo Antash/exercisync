@@ -242,7 +242,7 @@ class AerobiaService(ServiceBase):
         return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
 
     def _get_min_report_length(self, serviceRecord):
-        return serviceRecord.Config["export"]["min_report_length"] if "export" in serviceRecord.Config else REPORT_MIN_LIMIT
+        return serviceRecord.Config["export"]["min_report_length"] if "export" in serviceRecord.Config else self.REPORT_MIN_LIMIT
 
     def _with_auth(self, record, params={}):
         params.update({"authentication_token": record.Authorization["OAuthToken"]})
