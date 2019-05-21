@@ -3,13 +3,12 @@
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.api import APIException, UserException, UserExceptionType
 from tapiriik.services.tcx import TCXIO
-from tapiriik.settings import USER_DATA_FILES, WEB_ROOT, PRIMARY_HOST_NAME
+from tapiriik.settings import USER_DATA_FILES, WEB_ROOT
 from tapiriik.services.interchange import ActivityType
 from tapiriik.web.email import generate_message_from_template, send_email
 from tapiriik.database import db
 from bson.objectid import ObjectId
 
-import socket
 import django.utils.text
 import os
 import logging
@@ -95,10 +94,6 @@ class LocalExporterService(ServiceBase):
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
         self._ensure_user_root_exists(serviceRecord.ExternalID)
 
-        # restrict host to ensure downloaded activities are located on a single server
-        host = socket.gethostname()
-        db.users.update({"ConnectedServices.ID": ObjectId(serviceRecord._id)}, {"$set": {"SynchronizationHostRestriction": host}})
-
         return [], []
 
     def DownloadActivity(self, serviceRecord, activity):
@@ -121,23 +116,9 @@ class LocalExporterService(ServiceBase):
         shutil.make_archive(zipf_name, 'zip', user_folder)
 
         # To reduce disk usage delete all data except the result archive
-        # but keep root structure cause user is not yed disconnected
         shutil.rmtree(user_folder, ignore_errors=True)
-        #self._ensure_user_root_exists(serviceRecord.ExternalID)
 
         file_url = "{}/download/{}".format(WEB_ROOT, user_hash)
-
-        #host = socket.gethostname()
-        # if PRIMARY_HOST_NAME != host:
-        #     # send zip archive to the http server node
-        #     with open(zipf_name + ".zip", 'rb') as fileHandler:
-        #         file = {'file': (zipf_name, fileHandler)}
-        #         resp = requests.post(file_url, files=file)
-        #     if resp.status_code != 200:
-        #         logger.debug("Error uploading user file to primary host. (user: {}, file: {}, code: {}, data: {}".format(serviceRecord.ExternalID, zipf_name, resp.status_code, resp.text))
-        #         raise APIException("Error uploading user file.", user_exception=UserException(UserExceptionType.Other))
-        #     # Remove unused archive
-        #     os.remove(zipf_name + ".zip")
 
         context = {
             "url": file_url

@@ -6,9 +6,10 @@ from tapiriik.services import Service
 from tapiriik.auth import User
 from tapiriik.database import db
 from bson.objectid import ObjectId
+from tapiriik.settings import LOCAL_EXPORTER_HOSTS
 
 import json
-
+import random
 
 def auth_login(req, service):
     return redirect("/#/auth/%s" % service)
@@ -48,6 +49,10 @@ def auth_do(req, service):
         # set default settings
         if service == "localexporter":
             db.users.update({"_id": ObjectId(req.user["_id"])}, {"$set": {"Config": {"sync_skip_before": None}, "NextSyncIsExhaustive": True}})
+            # restrict host to ensure downloaded activities are located on a single server
+            if len(LOCAL_EXPORTER_HOSTS):
+                host = random.choice(LOCAL_EXPORTER_HOSTS)
+                db.users.update({"_id": ObjectId(req.user["_id"])}, {"$set": {"SynchronizationHostRestriction": host}})
 
         return True
     return False

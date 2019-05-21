@@ -18,7 +18,7 @@ MANAGERS = ADMINS
 
 ALLOWED_HOSTS = ["tapiriik.com", ".tapiriik.com", "localhost"]
 
-PRIMARY_HOST_NAME = None
+LOCAL_EXPORTER_HOSTS = []
 
 USE_X_FORWARDED_HOST = True
 
