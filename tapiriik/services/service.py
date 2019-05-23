@@ -48,7 +48,8 @@ class Service:
             Setio,
             Singletracker,
             DecathlonCoach,
-            PolarPersonalTrainer
+            PolarPersonalTrainer,
+            LocalExporter
         ] + PRIVATE_SERVICES
 
     def PreferredDownloadPriorityList():
@@ -56,6 +57,7 @@ class Service:
         # ...but that would require either a) downloading it from evry service or b) storing a lot more activity metadata
         # So, I think this will do for now
         return [
+            Aerobia, # For local upload from aerobia
             TrainerRoad, # Special case, since TR has a lot more data in some very specific areas
             GarminConnect, # The reference
             PolarFlow,
@@ -76,9 +78,9 @@ class Service:
             Pulsstory,
             Setio,
             Singletracker,
-            Aerobia,
             DecathlonCoach,
-            PolarPersonalTrainer
+            PolarPersonalTrainer,
+            LocalExporter
         ] + PRIVATE_SERVICES
 
     def WebInit():

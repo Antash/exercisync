@@ -64,12 +64,21 @@ def aerobia(req):
 
     config = conn.GetConfiguration()
     gearRules = config["gearRules"] if "gearRules" in config else []
+    export = config["export"] if "export" in config else {}
+    upload_media = export["upload_media_content"] if "upload_media_content" in export else False
+    min_report_length = export["min_report_length"] if "min_report_length" in export else 1000
+
     props = {
+        'component': 'aerobia',
         'aerobiaId': conn.ExternalID,
         'userToken': conn.Authorization["OAuthToken"],
         'sportTypes': conn.Service.SupportedActivities,
         'config': {
-                'gearRules': gearRules
+                'gearRules': gearRules,
+                'export': {
+                    'upload_media_content': 1 if upload_media else 0,
+                    'min_report_length': min_report_length
+                }
             }
     }
 
@@ -82,3 +91,32 @@ def aerobia(req):
             return redirect("dashboard")
 
     return render(req, "config/aerobia.html", {'props': props})
+
+
+class LocalExporterConfigForm(forms.Form):
+    pass
+
+def localexporter(req):
+    if not req.user:
+        return HttpResponse(status=403)
+    conn = User.GetConnectionRecord(req.user, "localexporter")
+
+    config = conn.GetConfiguration()
+    download_media = config["download_only_media_content"] if "download_only_media_content" in config else False
+    
+    props = {
+        'component': 'localexporter',
+        'config': {
+            'download_only_media_content': 1 if download_media else 0
+        }
+    }
+
+    if req.method == "POST":
+        form = LocalExporterConfigForm(req.POST)
+        if form.is_valid():
+            configRaw = req.POST.get('config')
+            config = json.loads(configRaw)
+            conn.SetConfiguration(config)
+            return redirect("dashboard")
+
+    return render(req, "config/localexporter.html", {'props': props})

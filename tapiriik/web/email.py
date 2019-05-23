@@ -15,6 +15,6 @@ def send_email(recipient_list, subject, html_message, plaintext_message=None):
 	if type(recipient_list) is not list:
 		recipient_list = [recipient_list]
 
-	email = EmailMultiAlternatives(subject=subject, body=plaintext_message, from_email="tapiriik <mailer@tapiriik.com>", to=recipient_list, headers={"Reply-To": "contact@tapiriik.com"})
+	email = EmailMultiAlternatives(subject=subject, body=plaintext_message, from_email="exercisync <help@exercisync.com>", to=recipient_list, headers={"Reply-To": "help@exercisync.com"})
 	email.attach_alternative(html_message, "text/html")
 	email.send()

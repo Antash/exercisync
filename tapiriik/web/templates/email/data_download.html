@@ -1,0 +1,12 @@
+{% extends "email/template.html" %}
+{% load i18n %}
+{% block content %}
+<h1>{% trans "Your data is ready!" %}</h1>
+<p>{% trans "Please, download your data by following " %}<a href="{{ url|safe }}">{% trans "this link." %}</a></p>
+{% endblock %}
+{% block plaintextcontent %}
+{% trans "Your data is ready!" %}
+
+{% trans "Please, download your data here: " %} {{ url|safe }}
+
+{% endblock %}

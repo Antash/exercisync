@@ -1,8 +1,8 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 
-import CSRFToken from './components/csrftoken'
-import RuleList from './components/ruleList'
+import CSRFToken from './csrftoken'
+import RuleList from './ruleList'
+import ExportConfig from './exportConfig'
 
 const urlGears = (userid, token) =>
     `http://aerobia.ru/users/${userid}/equipments?authentication_token=${token}`
@@ -13,7 +13,8 @@ class AerobiaConfig extends React.Component {
         this.state = {
             gears: [],
             requestFailed: false,
-            gearRules: props.config.gearRules
+            gearRules: props.config.gearRules,
+            export: props.config.export
         }
     }
 
@@ -56,14 +57,14 @@ class AerobiaConfig extends React.Component {
             })
     }
 
+    updateExportSettings(newState) {
+        this.setState({export: newState});
+    }
+
     updateGearRules(newState) {
         this.setState({gearRules: newState.rules});
     }
-
-    submitForm() {
-        $.post('/aerobiaConfig', JSON.stringify({ gearRules: this.state.gearRules }));
-    }
-
+    
     render() {
         const { sportTypes } = this.props;
         if (this.state.gears.length == 0)
@@ -77,6 +78,14 @@ class AerobiaConfig extends React.Component {
         return (
             <div>
                 <h1>Aerobia advanced settings</h1>
+
+                <div className="configBlock">
+                    <ExportConfig 
+                        data={this.state.export}
+                        handleChange={(newState) => this.updateExportSettings(newState)}
+                    />
+                </div>
+                
                 <div className="fancyTable activitiesTable configBlock">
                     <p>Default gear rules:</p>
                     <RuleList 
@@ -88,7 +97,7 @@ class AerobiaConfig extends React.Component {
                 </div>
                 <form method="POST" action="">
                     <CSRFToken />
-                    <input type="hidden" name="config" value={JSON.stringify({ gearRules: this.state.gearRules })} />
+                    <input type="hidden" name="config" value={JSON.stringify({ gearRules: this.state.gearRules, export: this.state.export })} />
                     <div className="configSubmit">
                         <button type="submit">Save</button>
                     </div>
@@ -98,7 +107,4 @@ class AerobiaConfig extends React.Component {
     }
 }
 
-ReactDOM.render(
-    React.createElement(AerobiaConfig, window.props),
-    window.react_mount,
-)
+export default AerobiaConfig;

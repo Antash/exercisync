@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-04 18:37+0300\n"
+"POT-Creation-Date: 2019-05-01 20:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,15 +19,15 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: .\tapiriik\settings.py:34
+#: .\tapiriik\settings.py:36
 msgid "English"
 msgstr "Английский"
 
-#: .\tapiriik\settings.py:35
+#: .\tapiriik\settings.py:37
 msgid "French"
 msgstr "Французский"
 
-#: .\tapiriik\settings.py:36
+#: .\tapiriik\settings.py:38
 msgid "Russian"
 msgstr "Русский"
 
@@ -35,31 +35,35 @@ msgstr "Русский"
 msgid "Your activities"
 msgstr "Ваши тренировки"
 
-#: .\tapiriik\web\templates\activities-dashboard.html:19
+#: .\tapiriik\web\templates\activities-dashboard.html:10
+msgid "Show only activities with sync errors:"
+msgstr "Показать только тренировки с ошибками синхронизации:"
+
+#: .\tapiriik\web\templates\activities-dashboard.html:20
 msgid "Stationary"
 msgstr "Стационарная"
 
-#: .\tapiriik\web\templates\activities-dashboard.html:22
+#: .\tapiriik\web\templates\activities-dashboard.html:23
 msgid "Present"
 msgstr "Существующая"
 
-#: .\tapiriik\web\templates\activities-dashboard.html:28
+#: .\tapiriik\web\templates\activities-dashboard.html:29
 msgid "This activity was not synchronized to the following services:"
 msgstr "Эта тренировка не была синхронизирована в эти сервисы:"
 
-#: .\tapiriik\web\templates\activities-dashboard.html:38
+#: .\tapiriik\web\templates\activities-dashboard.html:39
 msgid "exercisync doesn't know about any activities in your accounts"
 msgstr "exercisync не нашел тренировок в ваших профилях"
 
-#: .\tapiriik\web\templates\activities-dashboard.html:38
+#: .\tapiriik\web\templates\activities-dashboard.html:39
 msgid "Have you synchronized lately?"
 msgstr "Вы недавно синхронизировались?"
 
-#: .\tapiriik\web\templates\activities-dashboard.html:39
+#: .\tapiriik\web\templates\activities-dashboard.html:40
 msgid "Loading..."
 msgstr "Загрузка..."
 
-#: .\tapiriik\web\templates\activities-dashboard.html:40
+#: .\tapiriik\web\templates\activities-dashboard.html:41
 msgid ""
 "<b>If your account is currently synchronizing</b>, those activities will "
 "appear here once the synchronization completes. All dates shown are in UTC."
@@ -216,6 +220,23 @@ msgstr "Банковской картой"
 #: .\tapiriik\web\templates\donation.html:17
 msgid "From mobile balance"
 msgstr "С баланса мобильного"
+
+#: .\tapiriik\web\templates\email\data_download.html:4
+#: .\tapiriik\web\templates\email\data_download.html:8
+msgid "Your data is ready!"
+msgstr "Ваши данные загружены!"
+
+#: .\tapiriik\web\templates\email\data_download.html:5
+msgid "Please, download your data by following "
+msgstr "Для того чтобы загрузить свои данные, перейдите, пожалуйста, по этой ссылке: "
+
+#: .\tapiriik\web\templates\email\data_download.html:5
+msgid "this link."
+msgstr ""
+
+#: .\tapiriik\web\templates\email\data_download.html:10
+msgid "Please, download your data here: "
+msgstr "Для того чтобы загрузить свои данные, перейдите, пожалуйста, по этой ссылке: "
 
 #: .\tapiriik\web\templates\email\payment_confirm.html:4
 msgid "You're good to go"
@@ -564,7 +585,7 @@ msgstr "Загружать тренировки"
 msgid "after they finish, but skip them if they happened"
 msgstr "сразу же после их завершения, но игнорировать тренировки"
 
-#: .\tapiriik\web\templates\settings-block.html:25
+#: .\tapiriik\web\templates\settings-block.html:29
 #: .\tapiriik\web\templates\settings.html:49
 msgid "Save"
 msgstr "Сохранить"
@@ -653,10 +674,10 @@ msgstr ""
 #: .\tapiriik\web\templates\static\contact.html:15
 msgid ""
 "If you are making an enquiry regarding the European Union's General Data "
-"Protection Regulation, please mention "
+"Protection Regulation, please mention &quot;GDPR&quot; in the subject line."
 msgstr ""
 "Если вы делаете запрос в отношении регулирования защиты общих данных "
-"Европейского Союза, пожалуйста, укажите "
+"Европейского Союза, пожалуйста, укажите &quot;GDPR&quot; в теме письма."
 
 #: .\tapiriik\web\templates\static\credits.html:7
 msgid "Exercisync is based on the"

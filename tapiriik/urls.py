@@ -29,9 +29,12 @@ urlpatterns = patterns('',
 
     url(r'^rollback$', 'tapiriik.web.views.rollback_dashboard', {}, name='rollback_dashboard', ),
 
+    url(r'^download/(?P<file_id>.+)$', 'tapiriik.web.views.save_content', {}, name='save_content', ),
+
     url(r'^configure/save/(?P<service>.+)?$', 'tapiriik.web.views.config.config_save', {}, name='config_save', ),
     url(r'^configure/dropbox$', 'tapiriik.web.views.config.dropbox', {}, name='dropbox_config', ),
     url(r'^aerobiaConfig$', 'tapiriik.web.views.config.aerobia', {}, name='aerobia_config', ),
+    url(r'^localExporterConfig$', 'tapiriik.web.views.config.localexporter', {}, name='localexporter_config', ),
     url(r'^configure/flow/save/(?P<service>.+)?$', 'tapiriik.web.views.config.config_flow_save', {}, name='config_flow_save', ),
     url(r'^settings/?$', 'tapiriik.web.views.settings.settings', {}, name='settings_panel', ),
 

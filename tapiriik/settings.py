@@ -18,6 +18,8 @@ MANAGERS = ADMINS
 
 ALLOWED_HOSTS = ["tapiriik.com", ".tapiriik.com", "localhost"]
 
+LOCAL_EXPORTER_HOSTS = []
+
 USE_X_FORWARDED_HOST = True
 
 # Local time zone for this installation. Choices can be found here:

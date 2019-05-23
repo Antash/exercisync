@@ -34,6 +34,9 @@ class AerobiaService(ServiceBase):
     Configurable = True
     ConfigurationDefaults = {}
 
+    # notes longer than this number by default considered as reports and being saved separatelly
+    REPORT_MIN_LIMIT = 1000
+
     # common -> aerobia (garmin tcx sport names)
     # todo may better to include this into tcxio logic instead
     _activityMappings = {
@@ -54,7 +57,8 @@ class AerobiaService(ServiceBase):
         ActivityType.Climbing : "Rock climbing",
         ActivityType.RollerSkiing : "Roller skiing",
         ActivityType.StrengthTraining : "Ofp",
-        ActivityType.Other : "Sport"
+        ActivityType.Other : "Sport",
+        ActivityType.Report : "Report"
     }
 
     # aerobia -> common
@@ -142,7 +146,7 @@ class AerobiaService(ServiceBase):
 
     SupportsActivityDeletion = True
 
-    _sessionCache = SessionCache("aerobia", lifetime=timedelta(minutes=120), freshen_on_get=True)
+    _sessionCache = SessionCache("aerobia", lifetime=timedelta(minutes=120), freshen_on_get=False)
     _obligatory_headers = {
         # Without user-agent patch aerobia requests doesn't work
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"
@@ -155,11 +159,15 @@ class AerobiaService(ServiceBase):
     _workoutUrlJson = _apiRoot + "workouts/{id}.json"
     _workoutUrl = _urlRoot + "workouts/{id}"
     _uploadsUrl = _apiRoot + "uploads.json"
+    _postsUrl = _apiRoot + "my/posts"
+    _postUrlJson = _apiRoot + "posts/{id}.json"
 
-    def _get_session(self, record=None, username=None):
-        cached = self._sessionCache.Get(record.ExternalID if record else username)
-        if cached:
-            return cached
+    def _get_session(self, record=None, username=None, skip_cache=False):
+        if not skip_cache:
+            cached = self._sessionCache.Get(record.ExternalID if record else username)
+            if cached:
+                logger.debug("Using cached credential")
+                return cached
 
         session = requests.Session()
         session.headers.update(self._obligatory_headers)
@@ -174,7 +182,7 @@ class AerobiaService(ServiceBase):
             password = CredentialStore.Decrypt(record.ExtendedAuthorization["Password"])
             username = CredentialStore.Decrypt(record.ExtendedAuthorization["Email"])
 
-        session = self._get_session(record, username)
+        session = self._get_session(record, username, skip_cache=True)
         request_parameters = {"user[email]": username, "user[password]": password}
         res = session.post(self._loginUrlRoot, data=request_parameters)
 
@@ -190,21 +198,33 @@ class AerobiaService(ServiceBase):
         user_id = int(res_xml.find("user/id").get("value"))
         user_token = res_xml.find("user/authentication_token").get("value")
 
+        # Not really need to cache sessions for aerobia
+        #self._sessionCache.Set(record.ExternalID if record else username, session)
+
         return user_id, user_token
 
-    def _call(self, serviceRecord, request_call, *args):
-        retry_count = 3
+    def _safe_call(self, serviceRecord, method, endpoint, params={}, files=None, retry_count=3):
         resp = None
         for i in range(0, retry_count):
             try:
-                resp = request_call(args)
-                break
-            except APIException as ex:
-                # try to refresh token first
+                session = self._get_session(serviceRecord)
+                if method == "get":
+                    resp = session.get(endpoint, params=self._with_auth(serviceRecord, params))
+                elif method == "post":
+                    resp = session.post(endpoint, data=self._with_auth(serviceRecord, params), files=files)
+                else:
+                    raise APIException("Unsupported method: {}".format(method), user_exception=UserException(UserExceptionType.Other))
+
+                if resp.status_code == 200:
+                    # For some reason aerobia api always return 200 instead of 401
+                    if "/users/sign_up" not in resp.text and "неверный ключ аутентификации" not in resp.text.lower():
+                        break
+                # most likely token or session expired.
                 self._refresh_token(serviceRecord)
-            except requests.exceptions.ConnectTimeout as ex:
+            except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as ex:
                 # Aerobia sometimes answer like
-                # Failed to establish a new connection: [WinError 10060] may happen while listing.
+                # "Remote end closed connection without response"
+                # "Failed to establish a new connection: [WinError 10060]"
                 # wait a bit and retry
                 time.sleep(.2)
         if resp is None:
@@ -217,6 +237,12 @@ class AerobiaService(ServiceBase):
         auth_datails = {"OAuthToken": user_token}
         record.Authorization.update(auth_datails)
         db.connections.update({"_id": record._id}, {"$set": {"Authorization": auth_datails}})
+
+    def _should_load_media_only(self, serviceRecord):
+        return serviceRecord.Config["export"]["upload_media_content"] if "export" in serviceRecord.Config else False
+
+    def _get_min_report_length(self, serviceRecord):
+        return serviceRecord.Config["export"]["min_report_length"] if "export" in serviceRecord.Config else self.REPORT_MIN_LIMIT
 
     def _with_auth(self, record, params={}):
         params.update({"authentication_token": record.Authorization["OAuthToken"]})
@@ -238,12 +264,10 @@ class AerobiaService(ServiceBase):
         activities = []
         exclusions = []
 
-        fetch_diary = lambda page=1: self._get_diary_xml(serviceRecord, page)
-
         total_pages = None
         page = 1
         while True:
-            diary_xml = self._call(serviceRecord, fetch_diary, page)
+            diary_xml = self._get_diary_xml(serviceRecord, self._workoutsUrl, page)
 
             for workout_info in diary_xml.findall("workouts/r"):
                 activity = self._create_activity(workout_info)
@@ -259,11 +283,26 @@ class AerobiaService(ServiceBase):
             if not exhaustive or page > total_pages:
                 break
 
+        page = 1
+        has_more = True
+        while has_more:
+            feed_xml = self._get_diary_xml(serviceRecord, self._postsUrl, page)
+
+            for post_info in feed_xml.findall("posts/r"):
+                activity = self._create_post(post_info)
+                activities.append(activity)
+
+            pagination = feed_xml.find("pagination")
+            has_more = pagination.get("more") == "true" if pagination is not None else False
+            page += 1
+
+            if not exhaustive:
+                break
+
         return activities, exclusions
 
-    def _get_diary_xml(self, serviceRecord, page=1):
-        session = self._get_session(serviceRecord)
-        diary_data = session.get(self._workoutsUrl, params=self._with_auth(serviceRecord, {"page": page}))
+    def _get_diary_xml(self, serviceRecord, endpoint, page=1):
+        diary_data = self._safe_call(serviceRecord, "get", endpoint, {"page": page})
         diary_xml = etree.fromstring(diary_data.text.encode('utf-8'))
 
         info = diary_xml.find("info")
@@ -271,6 +310,29 @@ class AerobiaService(ServiceBase):
             raise APIException(info.get("description"), user_exception=UserException(UserExceptionType.DownloadError))
 
         return diary_xml
+
+    def _create_post(self, data):
+        post = UploadedActivity()
+        post.Type = ActivityType.Report
+        post.Stationary = True
+
+        post_xml = data.find("post")
+
+        post.Name = post_xml.get("title")
+        post.NotesExt = post_xml.get("formatted_body")
+        post.StartTime = pytz.utc.localize(datetime.strptime(post_xml.get("created_at"), "%Y-%m-%dT%H:%M:%SZ"))
+        #need to set EndTime for consistency
+        post.EndTime = post.StartTime
+
+        post.ServiceData = {"ActivityID": post_xml.get("id")}
+
+        if int(post_xml.get("photos_count")) > 0:
+            for photo_xml in data.findall("photos/photo"):
+                post.PhotoUrls.append({"id": photo_xml.get("id"), "url": photo_xml.get("image_original")})
+
+        logger.debug("\tPost s/t {}: {}".format(post.StartTime, post.Type))
+        post.CalculateUID()
+        return post
 
     def _create_activity(self, data):
         activity = UploadedActivity()
@@ -299,15 +361,39 @@ class AerobiaService(ServiceBase):
         return activity
 
     def DownloadActivity(self, serviceRecord, activity):
-        session = self._get_session(serviceRecord)
         activity_id = activity.ServiceData["ActivityID"]
 
-        tcx_data = session.get("{}export/workouts/{}/tcx".format(self._urlRoot, activity_id), data=self._with_auth(serviceRecord))
-        activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)
+        load_media_only = self._should_load_media_only(serviceRecord)
+        min_report_length = self._get_min_report_length(serviceRecord)
+
+        # reports already contains all data
+        if activity.Type == ActivityType.Report:
+            # ignore short posts without photos
+            if not len(activity.PhotoUrls) and len(activity.NotesExt) < min_report_length:
+                activity.Ignore = True
+            return activity
+
         # Obtain more information about activity
-        res = session.get(self._workoutUrlJson.format(id=activity_id), data=self._with_auth(serviceRecord))
+        res = self._safe_call(serviceRecord, "get", self._workoutUrlJson.format(id=activity_id))
         activity_data = res.json()
-        activity_ex.Name = activity_data["name"]
+        
+        if "photos" not in activity_data["post"] and load_media_only:
+            # Ignore activities without media
+            activity.Ignore = True
+            return activity
+
+        tcx_data = self._safe_call(serviceRecord, "get", "{}export/workouts/{}/tcx".format(self._urlRoot, activity_id))
+        try:
+            activity_ex = TCXIO.Parse(tcx_data.text.encode('utf-8'), activity)
+        except:
+            logger.debug("Unable to parse activity tcx: data corrupted")
+            raise APIException("Unable to parse activity tcx: data corrupted")
+
+        activity_ex.Name = activity_data["name"] if "name" in activity_data else ""
+
+        if "photos" in activity_data["post"]:
+            for img_info in activity_data["post"]["photos"]:
+                activity_ex.PhotoUrls.append({"id": img_info["id"], "url": img_info["original"]})
         # Notes comes as html. Hardly any other service will support this so needs to extract text data
         if "body" in activity_data["post"]:
             post_html = activity_data["post"]["body"]
@@ -316,18 +402,25 @@ class AerobiaService(ServiceBase):
             for style in soup("style"):
                 style.decompose()
             activity_ex.Notes = soup.getText()
+            # all notes with photos considered as reports
+            if len(activity_ex.Notes) < min_report_length:
+                if len(activity_ex.PhotoUrls):
+                    activity_ex.NotesExt = soup.prettify()
+                elif load_media_only:
+                    # ignore activities with a very short notes
+                    activity_ex.Ignore = True
 
         # Dirty hack to patch users inventory even if they use aerobia mobile app to record activities
         # Still need to sync with some service though.
-        extra_data = {}
-        self._put_default_inventory(activity, serviceRecord, extra_data)
-        if extra_data:
-            self._patch_activity(serviceRecord, extra_data, activity_id)
+        # TODO should driven by setting
+        #extra_data = {}
+        #self._put_default_inventory(activity, serviceRecord, extra_data)
+        #if extra_data:
+        #    self._patch_activity(serviceRecord, extra_data, activity_id)
 
         return activity_ex
 
     def UploadActivity(self, serviceRecord, activity):
-        session = self._get_session(serviceRecord)
         tcx_data = None
         # If some service provides ready-to-use tcx data why not to use it?
         if "tcx" in activity.PrerenderedFormats:
@@ -343,7 +436,7 @@ class AerobiaService(ServiceBase):
         data = {"name": activity_name,
                 "description": activity.Notes}
         files = {"file": ("tap-sync-{}-{}.tcx".format(os.getpid(), activity.UID), tcx_data)}
-        res = session.post(self._uploadsUrl, data=self._with_auth(serviceRecord, data), files=files)
+        res = self._safe_call(serviceRecord, "post", self._uploadsUrl, data, files)
         res_obj = res.json()
         uploaded_id = res_obj["workouts"][0]["id"]
 
@@ -376,12 +469,9 @@ class AerobiaService(ServiceBase):
             data.update({"workout[inventory_ids][]": inventory})
 
     def _patch_activity(self, serviceRecord, data, activity_id):
-        session = self._get_session(serviceRecord)
-
         data.update({"_method": "put"})
-        update_activity = lambda x: session.post(self._workoutUrl.format(id=activity_id), data=self._with_auth(serviceRecord, data))
         try:
-            self._call(serviceRecord, update_activity)
+            self._safe_call(serviceRecord, "post", self._workoutUrl.format(id=activity_id), data)
         except Exception as e:
             # do nothing but logging - anything critical happened to interrupt process
             logger.debug("Unable to patch activity: " + e)
@@ -392,10 +482,8 @@ class AerobiaService(ServiceBase):
         #return self.UserActivityURL.format(userId, uploadId)
 
     def DeleteActivity(self, serviceRecord, uploadId):
-        session = self._get_session(serviceRecord)
         delete_parameters = {"_method" : "delete"}
-        delete_call = lambda x: session.post("{}workouts/{}".format(self._urlRoot, uploadId), data=self._with_auth(serviceRecord, delete_parameters))
-        self._call(serviceRecord, delete_call)
+        self._safe_call(serviceRecord, "post", "{}workouts/{}".format(self._urlRoot, uploadId), delete_parameters)
 
     def DeleteCachedData(self, serviceRecord):
         pass  # No cached data...
