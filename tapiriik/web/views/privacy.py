@@ -33,7 +33,7 @@ def privacy(request):
     #services["singletracker"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
     services["aerobia"].update({"email": OPTIN, "password": OPTIN, "tokens": NO, "metadata": YES, "data":NO})
     services["polarflow"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
-    services["movescount"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
+    services["suunto"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
     services["decathloncoach"].update({"email": NO, "password": NO, "tokens": YES, "metadata": YES, "data":NO})
     services["polarpersonaltrainer"].update({"email": YES, "password": YES, "tokens": NO, "metadata": YES, "data":NO})
 
