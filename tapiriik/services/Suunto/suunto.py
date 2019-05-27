@@ -8,9 +8,13 @@ from tapiriik.database import db
 
 from django.core.urlresolvers import reverse
 from urllib.parse import urlencode
+from datetime import date, datetime
 
+import logging
 import requests
 import time
+
+logger = logging.getLogger(__name__)
 
 class SuuntoService(ServiceBase):
     ID = "suunto"
@@ -18,6 +22,31 @@ class SuuntoService(ServiceBase):
     DisplayAbbreviation = "SU"
     AuthenticationType = ServiceAuthenticationType.OAuth
     AuthenticationNoFrame = True # form not fit in the small frame
+    PartialSyncRequiresTrigger = True
+
+    ReceivesActivities = False 
+
+    _activity_type_mappings = {
+        ActivityType.Cycling: "Ride",
+        ActivityType.MountainBiking: "Ride",
+        ActivityType.Hiking: "Hike",
+        ActivityType.Running: "Run",
+        ActivityType.Walking: "Walk",
+        ActivityType.Snowboarding: "Snowboard",
+        ActivityType.Skating: "IceSkate",
+        ActivityType.CrossCountrySkiing: "NordicSki",
+        ActivityType.DownhillSkiing: "AlpineSki",
+        ActivityType.Swimming: "Swim",
+        ActivityType.Gym: "Workout",
+        ActivityType.Rowing: "Rowing",
+        ActivityType.RollerSkiing: "RollerSki",
+        ActivityType.StrengthTraining: "WeightTraining",
+        ActivityType.Climbing: "RockClimbing",
+        ActivityType.Wheelchair: "Wheelchair",
+        ActivityType.Other: "Other",
+    }
+
+    SupportedActivities = list(_activity_type_mappings.keys())
 
     _auth_api_endpoint = "https://cloudapi-oauth.suunto.com/"
     _api_endpoint = "https://cloudapi.suunto.com/v2/"
@@ -101,7 +130,16 @@ class SuuntoService(ServiceBase):
             "until": int(time.time() * 1000)
         }
         res = self._requestWithAuth(lambda session: session.get(self._api_endpoint + "workouts", params=params), serviceRecord)
+
+        if res.status_code != 200:
+            raise APIException("Error during activitieslist fetch.", user_exception=UserException(UserExceptionType.ListingError))
+
         data = res.json()
+        if data["error"]:
+            raise APIException(data["error"], user_exception=UserException(UserExceptionType.ListingError))
+        for activity_metadata in data["payload"]:
+
+
         return activities, exclusions
 
     def DownloadActivity(self, serviceRecord, activity):
