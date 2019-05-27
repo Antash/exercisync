@@ -26,6 +26,10 @@ class ActivityType:  # taken from RK API docs. The text values have no meaning e
     StandUpPaddling = "StandUpPaddling"
     Other = "Other"
     Report = "Report" # Text reports and other notes not contain activity data
+    Crossfit = "Crossfit"
+    Soccer = "Soccer"
+    Stepper = "StairStepper"
+    Yoga = "Yoga"
 
     def List():
         # I'd argue that this is marginally better than the 200+ char hardcoded list it's replacing

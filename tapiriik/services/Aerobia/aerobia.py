@@ -97,28 +97,28 @@ class AerobiaService(ServiceBase):
         38 : ActivityType.Other, #OTHER
         61 : ActivityType.Other, #WATER AEROBICS
         79 : ActivityType.Other, #ACROBATICS
-        23 : ActivityType.Other, #AEROBICS
+        23 : ActivityType.Gym, #AEROBICS
         26 : ActivityType.Other, #BOX
-        84 : ActivityType.Other, #CYCLOCROSS
+        84 : ActivityType.Cycling, #CYCLOCROSS
         24 : ActivityType.Other, #BADMINTON
         52 : ActivityType.Other, #VOLLEYBALL
         50 : ActivityType.Other, #MARTIAL ARTS
         49 : ActivityType.Other, #HANDBALL
-        48 : ActivityType.Other, #GYMNASTICS
+        48 : ActivityType.Gym, #GYMNASTICS
         4 : ActivityType.Other, #GOLF
         36 : ActivityType.Other, #SCUBA DIVING
         85 : ActivityType.Other, #DUATHLON
         69 : ActivityType.Other, #DELTAPLAN
-        47 : ActivityType.Other, #YOGA
+        47 : ActivityType.Yoga, #YOGA
         45 : ActivityType.Other, #KITEBOARDING
         80 : ActivityType.Other, #KERLING
         62 : ActivityType.Other, #HORSE RIDING
-        71 : ActivityType.Other, #СROSSFIT
+        71 : ActivityType.Crossfit, #СROSSFIT
         64 : ActivityType.Other, #CIRCLE WORKOUT
         78 : ActivityType.Other, #MOTORSPORT
         44 : ActivityType.Other, #ММА
         70 : ActivityType.Other, #PARAPLANE
-        35 : ActivityType.Other, #PILATES
+        35 : ActivityType.Gym, #PILATES
         20 : ActivityType.Other, #POLO
         33 : ActivityType.Other, #RUGBY
         60 : ActivityType.Other, #FISHING
@@ -126,12 +126,12 @@ class AerobiaService(ServiceBase):
         15 : ActivityType.Other, #WINDSURFING
         42 : ActivityType.Other, #SQUASH
         41 : ActivityType.Other, #SKATEBOARD
-        75 : ActivityType.Other, #STEPPER
+        75 : ActivityType.Stepper, #STEPPER
         29 : ActivityType.Other, #DANCING
         40 : ActivityType.Other, #TENNIS
         37 : ActivityType.Other, #TABLE TENNIS
         81 : ActivityType.Other, #OUTDOOR FITNESS
-        31 : ActivityType.Other, #FOOTBALL
+        31 : ActivityType.Soccer, #FOOTBALL
         59 : ActivityType.Other, #FENCING
         39 : ActivityType.Other, #FIGURE SKATING
         34 : ActivityType.Other, #HOCKEY
