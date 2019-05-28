@@ -4,7 +4,9 @@ from tapiriik.settings import WEB_ROOT, SUUNTO_CLIENT_SECRET, SUUNTO_CLIENT_ID
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.service_record import ServiceRecord
 from tapiriik.services.api import APIException, UserException, UserExceptionType
+from tapiriik.services.interchange import UploadedActivity, ActivityType
 from tapiriik.database import db
+from tapiriik.services.fit import FITIO
 
 from django.core.urlresolvers import reverse
 from urllib.parse import urlencode
@@ -22,28 +24,29 @@ class SuuntoService(ServiceBase):
     DisplayAbbreviation = "SU"
     AuthenticationType = ServiceAuthenticationType.OAuth
     AuthenticationNoFrame = True # form not fit in the small frame
-    PartialSyncRequiresTrigger = True
+    #TODO activity hook
+    #PartialSyncRequiresTrigger = True
 
     ReceivesActivities = False 
 
     _activity_type_mappings = {
-        ActivityType.Cycling: "Ride",
-        ActivityType.MountainBiking: "Ride",
-        ActivityType.Hiking: "Hike",
-        ActivityType.Running: "Run",
-        ActivityType.Walking: "Walk",
-        ActivityType.Snowboarding: "Snowboard",
+        ActivityType.Cycling: 3,
+        ActivityType.MountainBiking: 10,
+        ActivityType.Hiking: 11,
+        ActivityType.Running: 1,
+        ActivityType.Walking: 0,
+        ActivityType.Snowboarding: 30,
         ActivityType.Skating: "IceSkate",
-        ActivityType.CrossCountrySkiing: "NordicSki",
+        ActivityType.CrossCountrySkiing: 3,
         ActivityType.DownhillSkiing: "AlpineSki",
-        ActivityType.Swimming: "Swim",
-        ActivityType.Gym: "Workout",
+        ActivityType.Swimming: 21,
+        ActivityType.Gym: 23,
         ActivityType.Rowing: "Rowing",
         ActivityType.RollerSkiing: "RollerSki",
         ActivityType.StrengthTraining: "WeightTraining",
         ActivityType.Climbing: "RockClimbing",
         ActivityType.Wheelchair: "Wheelchair",
-        ActivityType.Other: "Other",
+        ActivityType.Other: 4,
     }
 
     SupportedActivities = list(_activity_type_mappings.keys())
@@ -82,6 +85,11 @@ class SuuntoService(ServiceBase):
             "Ocp-Apim-Subscription-Key": SUUNTO_CLIENT_SECRET
             })
         return reqLambda(session)
+
+    def _create_activity(self, data):
+        activity = UploadedActivity()
+        activity.ServiceData = {"ActivityID": data["workoutKey"]}
+        return True, activity
 
     def WebInit(self):
         params = {
@@ -125,27 +133,42 @@ class SuuntoService(ServiceBase):
         activities = []
         exclusions = []
 
-        params = {
-            "since": int((time.time() - 40000) * 1000),
-            "until": int(time.time() * 1000)
-        }
-        res = self._requestWithAuth(lambda session: session.get(self._api_endpoint + "workouts", params=params), serviceRecord)
+        since_epoch = int(datetime.datetime.utcfromtimestamp(0) if exhaustive else (time.time() - 60*60*24) * 1000)
+        until_epoch = int(time.time() * 1000)
 
-        if res.status_code != 200:
-            raise APIException("Error during activitieslist fetch.", user_exception=UserException(UserExceptionType.ListingError))
+        while True:
+            params = {
+                "since": since_epoch,
+                "until": until_epoch
+            }
+            res = self._requestWithAuth(lambda session: session.get(self._api_endpoint + "workouts", params=params), serviceRecord)
 
-        data = res.json()
-        if data["error"]:
-            raise APIException(data["error"], user_exception=UserException(UserExceptionType.ListingError))
-        for activity_metadata in data["payload"]:
+            if res.status_code != 200:
+                raise APIException("Error during activitieslist fetch.", user_exception=UserException(UserExceptionType.ListingError))
 
+            data = res.json()
+            if data["error"]:
+                raise APIException(data["error"], user_exception=UserException(UserExceptionType.ListingError))
+            for activity_metadata in data["payload"]:
+                compatible, activity = self._create_activity(activity_metadata)
+                if compatible:
+                    activities.append(activity)
+                else:
+                    exclusions.append(activity)
+            
+            since_epoch = data["metadata"]["until"]
+            if not exhaustive or data["metadata"]["workoutcount"] == "0":
+                break
 
         return activities, exclusions
 
     def DownloadActivity(self, serviceRecord, activity):
+        res = self._requestWithAuth(lambda session: session.get(self._api_endpoint + "workout/exportFit/{}".format(activity.ServiceData["ActivityID"])), serviceRecord)
+        activity
         pass
 
     def UploadActivity(self, serviceRecord, activity):
+        # Not supported
         pass
 
     def DeleteCachedData(self, serviceRecord):
