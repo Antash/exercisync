@@ -218,7 +218,6 @@ class PolarFlowService(ServiceBase):
     def DownloadActivityList(self, serviceRecord, exhaustive=False):
         activities = []
         exclusions = []
-        self._globalRateLimit()
         
         transaction_url = self._create_transaction(serviceRecord)
         if transaction_url:
@@ -266,7 +265,6 @@ class PolarFlowService(ServiceBase):
         return activity
 
     def DownloadActivity(self, serviceRecord, activity):
-        self._globalRateLimit()
         # NOTE tcx have to be gzipped but it actually doesn't
         # https://www.polar.com/accesslink-api/?python#get-tcx
         #tcx_data_raw = requests.get(activity_link + "/tcx", headers=self._api_headers(serviceRecord))
