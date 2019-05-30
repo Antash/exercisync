@@ -4,13 +4,13 @@ from tapiriik.settings import WEB_ROOT, SUUNTO_CLIENT_SECRET, SUUNTO_CLIENT_ID
 from tapiriik.services.service_base import ServiceAuthenticationType, ServiceBase
 from tapiriik.services.service_record import ServiceRecord
 from tapiriik.services.api import APIException, UserException, UserExceptionType
-from tapiriik.services.interchange import UploadedActivity, ActivityType
+from tapiriik.services.interchange import UploadedActivity, ActivityType, ActivityStatistic, ActivityStatistics, ActivityStatisticUnit
 from tapiriik.database import db
 from tapiriik.services.fit import FITIO
 
 from django.core.urlresolvers import reverse
 from urllib.parse import urlencode
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import logging
 import requests
@@ -36,17 +36,35 @@ class SuuntoService(ServiceBase):
         ActivityType.Running: 1,
         ActivityType.Walking: 0,
         ActivityType.Snowboarding: 30,
-        ActivityType.Skating: "IceSkate",
+        ActivityType.Skating: 49,
         ActivityType.CrossCountrySkiing: 3,
-        ActivityType.DownhillSkiing: "AlpineSki",
+        ActivityType.DownhillSkiing: 13,
         ActivityType.Swimming: 21,
         ActivityType.Gym: 23,
-        ActivityType.Rowing: "Rowing",
-        ActivityType.RollerSkiing: "RollerSki",
-        ActivityType.StrengthTraining: "WeightTraining",
-        ActivityType.Climbing: "RockClimbing",
-        ActivityType.Wheelchair: "Wheelchair",
+        ActivityType.Rowing: 15,
+        ActivityType.RollerSkiing: 56,
+        ActivityType.StrengthTraining: 23,
+        ActivityType.Climbing: 29,
         ActivityType.Other: 4,
+    }
+
+    _reverse_activity_type_mappings = {
+        3: ActivityType.Cycling,
+        10: ActivityType.MountainBiking,
+        11: ActivityType.Hiking,
+        1: ActivityType.Running,
+        0: ActivityType.Walking,
+        30: ActivityType.Snowboarding,
+        49: ActivityType.Skating,
+        3: ActivityType.CrossCountrySkiing,
+        13: ActivityType.DownhillSkiing,
+        21: ActivityType.Swimming,
+        23: ActivityType.Gym,
+        15: ActivityType.Rowing,
+        56: ActivityType.RollerSkiing,
+        23: ActivityType.StrengthTraining,
+        29: ActivityType.Climbing,
+        4: ActivityType.Other,
     }
 
     SupportedActivities = list(_activity_type_mappings.keys())
@@ -88,8 +106,21 @@ class SuuntoService(ServiceBase):
 
     def _create_activity(self, data):
         activity = UploadedActivity()
+        activity.Type = self._reverse_activity_type_mappings[data["activityId"]]
+        activity.StartTime = datetime.fromtimestamp(float(data["startTime"])/1000)
+        activity.EndTime = activity.StartTime + timedelta(0, data["totalTime"])
+        # TODO detect stationary
+        #activity.Stationary = 
+        activity.GPS = (data["centerPosition"]["x"] != 0) and (data["centerPosition"]["y"] != 0)
+        if "description" in data:
+            activity.Notes = data["description"]
+        activity.Stats.Distance = ActivityStatistic(ActivityStatisticUnit.Meters, value=data["totalDistance"])
+        activity.Stats.Energy = 
+        activity.Stats.Speed = 
+        activity.Stats.Cadence = 
+        activity.Stats.HR = 
         activity.ServiceData = {"ActivityID": data["workoutKey"]}
-        return True, activity
+        return activity
 
     def WebInit(self):
         params = {
@@ -133,7 +164,7 @@ class SuuntoService(ServiceBase):
         activities = []
         exclusions = []
 
-        since_epoch = int(datetime.datetime.utcfromtimestamp(0) if exhaustive else (time.time() - 60*60*24) * 1000)
+        since_epoch = int(0 if exhaustive else (time.time() - 60*60*24*30) * 1000)
         until_epoch = int(time.time() * 1000)
 
         while True:
@@ -150,11 +181,14 @@ class SuuntoService(ServiceBase):
             if data["error"]:
                 raise APIException(data["error"], user_exception=UserException(UserExceptionType.ListingError))
             for activity_metadata in data["payload"]:
-                compatible, activity = self._create_activity(activity_metadata)
-                if compatible:
-                    activities.append(activity)
-                else:
-                    exclusions.append(activity)
+                activity = self._create_activity(activity_metadata)
+                logger.debug("\tActivity s/t {}: {}".format(activity.StartTime, activity.Type))
+                if activity_metadata["activityId"] not in self._reverse_activity_type_mappings:
+                    exclusions.append(APIExcludeActivity("Unsupported activity type {}".format(activity_metadata["activityId"]), activity_id=activity_metadata["workoutKey"], user_exception=UserException(UserExceptionType.Other)))
+                    logger.debug("\t\tUnknown activity")
+
+                activity.CalculateUID()
+                activities.append(activity)
             
             since_epoch = data["metadata"]["until"]
             if not exhaustive or data["metadata"]["workoutcount"] == "0":
@@ -164,8 +198,14 @@ class SuuntoService(ServiceBase):
 
     def DownloadActivity(self, serviceRecord, activity):
         res = self._requestWithAuth(lambda session: session.get(self._api_endpoint + "workout/exportFit/{}".format(activity.ServiceData["ActivityID"])), serviceRecord)
-        activity
-        pass
+        if res.status_code != 200:
+            raise APIException(data["error"], user_exception=UserException(UserExceptionType.ListingError))
+        try:
+            activity = FITIO.Parse(res.text, activity)
+        except:
+            logger.debug("Unable to parse activity fit: data corrupted")
+            raise APIException("Unable to parse activity tcx: data corrupted", user_exception=UserException(UserExceptionType.DownloadError))
+        return activity
 
     def UploadActivity(self, serviceRecord, activity):
         # Not supported
