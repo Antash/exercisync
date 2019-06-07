@@ -30,6 +30,7 @@ class ActivityType:  # taken from RK API docs. The text values have no meaning e
     Soccer = "Soccer"
     Stepper = "StairStepper"
     Yoga = "Yoga"
+    RollerSkating = "RollerSkating"
 
     def List():
         # I'd argue that this is marginally better than the 200+ char hardcoded list it's replacing

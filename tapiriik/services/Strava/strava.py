@@ -58,6 +58,7 @@ class StravaService(ServiceBase):
         ActivityType.Soccer: "Soccer",
         ActivityType.Stepper: "StairStepper",
         ActivityType.Yoga: "Yoga",
+        ActivityType.RollerSkating: "InlineSkate"
     }
 
     # For mapping Strava->common
@@ -90,6 +91,7 @@ class StravaService(ServiceBase):
         "Soccer": ActivityType.Soccer,
         "StairStepper": ActivityType.Stepper,
         "Yoga": ActivityType.Yoga,
+        "InlineSkate": ActivityType.RollerSkating,
     }
 
     SupportedActivities = list(_activityTypeMappings.keys())

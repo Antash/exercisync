@@ -89,7 +89,7 @@ class AerobiaService(ServiceBase):
         55 : ActivityType.Other, #roller sport
         77 : ActivityType.Running, #tredmill
         66 : ActivityType.Other, #roller skiing
-        7 : ActivityType.Other, #rollers
+        7 : ActivityType.RollerSkating, #rollers
         58 : ActivityType.Other, #nordic walking
         10 : ActivityType.Other, #snowboarding
         16 : ActivityType.Other, #walking sport
