@@ -115,10 +115,10 @@ class SuuntoService(ServiceBase):
         if "description" in data:
             activity.Notes = data["description"]
         activity.Stats.Distance = ActivityStatistic(ActivityStatisticUnit.Meters, value=data["totalDistance"])
-        activity.Stats.Energy = 
-        activity.Stats.Speed = 
-        activity.Stats.Cadence = 
-        activity.Stats.HR = 
+        activity.Stats.Energy = ActivityStatistic(ActivityStatisticUnit.Kilocalories, value=data["energyConsumption"])
+        activity.Stats.Speed = ActivityStatistic(ActivityStatisticUnit.MetersPerSecond, avg=data["avgSpeed"], max=data["maxSpeed"])
+        activity.Stats.Cadence = ActivityStatistic(ActivityStatisticUnit.RevolutionsPerMinute, avg=data["cadence"]["avg"], max=data["cadence"]["max"])
+        activity.Stats.HR = ActivityStatistic(ActivityStatisticUnit.BeatsPerMinute, avg=data["hrdata"]["workoutAvgHR"], max=data["hrdata"]["workoutMaxHR"])
         activity.ServiceData = {"ActivityID": data["workoutKey"]}
         return activity
 
@@ -201,10 +201,10 @@ class SuuntoService(ServiceBase):
         if res.status_code != 200:
             raise APIException(data["error"], user_exception=UserException(UserExceptionType.ListingError))
         try:
-            activity = FITIO.Parse(res.text, activity)
+            activity = FITIO.Parse(res._content, activity)
         except:
             logger.debug("Unable to parse activity fit: data corrupted")
-            raise APIException("Unable to parse activity tcx: data corrupted", user_exception=UserException(UserExceptionType.DownloadError))
+            raise APIException("Unable to parse activity fit: data corrupted", user_exception=UserException(UserExceptionType.DownloadError))
         return activity
 
     def UploadActivity(self, serviceRecord, activity):

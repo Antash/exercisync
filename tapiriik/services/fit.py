@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from .interchange import WaypointType, ActivityStatisticUnit, ActivityType, LapIntensity, LapTriggerMethod
 from .devices import DeviceIdentifier, DeviceIdentifierType
+from fitparse import FitFile, FitParseError
 import struct
 import sys
 import pytz
@@ -394,8 +395,14 @@ class FITIO:
 		tag = ".FIT"
 		return struct.pack("<BBHI4s", header_len, protocolVer, profileVer, dataLength, tag.encode("ASCII"))
 
-	def Parse(raw_file):
-		raise Exception("Not implemented")
+	def Parse(raw_file, activity):
+		try:
+			file = FitFile(raw_file)
+			file.parse()
+		except FitParseError as e:
+			# Just re-raise.
+			raise e
+		return activity
 
 	def Dump(act, drop_pauses=False):
 		def toUtc(ts):
