@@ -86,7 +86,7 @@ class AerobiaService(ServiceBase):
         65 : ActivityType.Other, #triathlon
         51 : ActivityType.Other, #beach volleyball
         53 : ActivityType.Other, #basketball
-        55 : ActivityType.Other, #roller sport
+        55 : ActivityType.RollerSkating, #roller sport
         77 : ActivityType.Running, #tredmill
         66 : ActivityType.Other, #roller skiing
         7 : ActivityType.RollerSkating, #rollers
