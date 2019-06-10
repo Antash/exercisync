@@ -58,6 +58,7 @@ class AerobiaService(ServiceBase):
         ActivityType.RollerSkiing : "Roller skiing",
         ActivityType.StrengthTraining : "Ofp",
         ActivityType.Other : "Sport",
+        ActivityType.RollerSkating : "Roller Skating",
         ActivityType.Report : "Report"
     }
 
