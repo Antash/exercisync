@@ -33,6 +33,7 @@ class GarminConnectService(ServiceBase):
     DisplayAbbreviation = "GC"
     AuthenticationType = ServiceAuthenticationType.UsernamePassword
     RequiresExtendedAuthorizationDetails = True
+    SuppliesActivities = False
     PartialSyncRequiresTrigger = len(GARMIN_CONNECT_USER_WATCH_ACCOUNTS) > 0
     PartialSyncTriggerPollInterval = timedelta(minutes=20)
     PartialSyncTriggerPollMultiple = len(GARMIN_CONNECT_USER_WATCH_ACCOUNTS.keys())
