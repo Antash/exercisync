@@ -52,6 +52,7 @@ class UserExceptionType:
     NonAthleteAccount = "non_athlete_account" # trainingpeaks
     NotAValidEmail = "not_a_valid_email" # localExporter
     EmailsDoNotMatch = "emails_do_not_match" # localExporter 
+    GCUploadConsent = "gc_upload_consent" # EU User must grant upload consent on GC
 
     # Activity-level exceptions
     FlowException = "flow"
