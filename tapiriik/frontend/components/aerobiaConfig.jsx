@@ -5,7 +5,7 @@ import RuleList from './ruleList'
 import ExportConfig from './exportConfig'
 
 const urlGears = (userid, token) =>
-    `http://aerobia.ru/users/${userid}/equipments?authentication_token=${token}`
+    `http://old15.aerobia.ru/users/${userid}/equipments?authentication_token=${token}`
 
 class AerobiaConfig extends React.Component {
     constructor(props) {
