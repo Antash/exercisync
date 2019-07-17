@@ -145,7 +145,9 @@ class AerobiaService(ServiceBase):
 
     SupportsHR = SupportsCadence = True
 
-    SupportsActivityDeletion = True
+    # old Aerobia is in read-only mode
+    SupportsActivityDeletion = False
+    ReceivesActivities = False
 
     _sessionCache = SessionCache("aerobia", lifetime=timedelta(minutes=120), freshen_on_get=False)
     _obligatory_headers = {
