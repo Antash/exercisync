@@ -44,6 +44,7 @@ urlpatterns = patterns('',
     url(r'^sync/activity$', 'tapiriik.web.views.sync_recent_activity', {}, name='sync_recent_activity'),
     url(r'^sync/schedule/now$', 'tapiriik.web.views.sync_schedule_immediate', {}, name='sync_schedule_immediate'),
     url(r'^sync/errors/(?P<service>[^/]+)/clear/(?P<group>.+)$', 'tapiriik.web.views.sync_clear_errorgroup', {}, name='sync_clear_errorgroup'),
+    url(r'^sync/bad_activities_acknowledgement_clear$', 'tapiriik.web.views.sync_clear_badactivitiesacknowledgement', {}, name='sync_clear_errorgroup'),
 
     url(r'^activities$', 'tapiriik.web.views.activities_dashboard', {}, name='activities_dashboard'),
     url(r'^activities/fetch$', 'tapiriik.web.views.activities_fetch_json', {}, name='activities_fetch_json'),
@@ -79,6 +80,7 @@ urlpatterns = patterns('',
     url(r'^privacy$', 'tapiriik.web.views.privacy.privacy', name='privacy'),
 
     url(r'^garmin_connect_users$', TemplateView.as_view(template_name='static/garmin_connect_users.html'), name='garmin_connect_users'),
+    url(r'^garmin_connect_bad_data$', TemplateView.as_view(template_name='static/garmin_connect_bad_data.html'), name='garmin_connect_users'),
 
     url(r'^faq$', TemplateView.as_view(template_name='static/faq.html'), name='faq'),
     url(r'^credits$', TemplateView.as_view(template_name='static/credits.html'), name='credits'),

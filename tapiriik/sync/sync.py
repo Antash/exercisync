@@ -167,7 +167,8 @@ class Sync:
 
         result = None
         try:
-            result = Sync.PerformUserSync(user, exhaustive, heartbeat_callback=heartbeat_callback)
+            if not user.get("BlockedOnBadActivitiesAcknowledgement", False):
+                result = Sync.PerformUserSync(user, exhaustive, heartbeat_callback=heartbeat_callback)
         finally:
             nextSync = None
             if User.HasActivePayment(user):
@@ -295,7 +296,7 @@ class SynchronizationTask:
 
             if not self._isServiceExcluded(conn) and not self._shouldPersistServiceTrigger(conn):
                 # Only reset the trigger if we succesfully got through the entire sync without bailing on this particular connection
-                update_values["$unset"] = {"TriggerPartialSync": None}
+                update_values["$unset"] = {"TriggerPartialSync": None, "TriggerPartialSyncPayloads": None}
 
             try:
                 db.connections.update({"_id": conn._id}, update_values)
