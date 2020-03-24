@@ -9,5 +9,6 @@ node_modules/
 export_data/
 webpack-stats.json
 .vscode/
+.env/
 *.hot-update.js
 *.hot-update.json
